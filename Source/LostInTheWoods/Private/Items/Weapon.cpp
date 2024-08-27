@@ -10,7 +10,7 @@ AWeapon::AWeapon()
 
 void AWeapon::Equip(USceneComponent* parentMesh, FName socketName)
 {
-	bStopHovering = true;
+	weaponState = EWeaponState::EWS_Equiped;
 	FAttachmentTransformRules attachmentRules(EAttachmentRule::SnapToTarget, true);
 	mesh->AttachToComponent(parentMesh, attachmentRules, FName("WeaponSocketR"));
 }

@@ -36,7 +36,7 @@ void AWarrior::BeginPlay()
 void AWarrior::Attack()
 {
 	
-	if (actionState == ECharacterActionState::ECAS_Unoccupied) {
+	if (CanAttack()) {
 		PlayAttackMontage();
 		actionState = ECharacterActionState::ECAS_Attacking;
 	}
@@ -87,7 +87,7 @@ void AWarrior::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AWarrior::MoveForward(float value)
 {
-	if (Controller&& value != 0) {
+	if (Controller&& value != 0 && actionState== ECharacterActionState::ECAS_Unoccupied) {
 		FRotator controllerRotation = Controller->GetControlRotation();//COntroller does have forward vector, sp we are taking controllers rotation
 		FRotator yawRotation(0.f, controllerRotation.Yaw, 0.f);
 
@@ -100,7 +100,7 @@ void AWarrior::MoveForward(float value)
 
 void AWarrior::MoveRight(float value)
 {
-	if (Controller && value != 0) {
+	if (Controller && value != 0 && actionState == ECharacterActionState::ECAS_Unoccupied) {
 		FRotator controllerRotation = Controller->GetControlRotation();
 		FRotator yawRotation(0.f, controllerRotation.Yaw, 0.f);
 		FVector rightVector= FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
@@ -117,6 +117,11 @@ void AWarrior::Turn(float value)
 void AWarrior::LookUp(float value)
 {
 	AddControllerPitchInput(value);
+}
+
+bool AWarrior::CanAttack()
+{
+	return actionState == ECharacterActionState::ECAS_Unoccupied && characterWeaponState == ECharacterWeaponEquipState::ECWES_Equipped;
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "EnumTypes.h"
 #include "Item.generated.h"
 
 UCLASS()
@@ -41,7 +42,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float spinRate;
 
-	bool bStopHovering = false;
+	EWeaponState weaponState = EWeaponState::EWS_Hovering;
 
 public:	
 	// Called every frame

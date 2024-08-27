@@ -81,6 +81,9 @@ private:
 	void LookUp(float value);
 	
 	//input functions end
+
+	//AttackFunction
+	bool CanAttack();
 	
 
 
