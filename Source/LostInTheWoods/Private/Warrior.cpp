@@ -35,6 +35,15 @@ void AWarrior::BeginPlay()
 
 void AWarrior::Attack()
 {
+	
+	if (actionState == ECharacterActionState::ECAS_Unoccupied) {
+		PlayAttackMontage();
+		actionState = ECharacterActionState::ECAS_Attacking;
+	}
+}
+
+void AWarrior::PlayAttackMontage()
+{
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 	int32 randomIndex = FMath::RandRange(0, 1);
 
@@ -48,6 +57,11 @@ void AWarrior::Attack()
 		animInstance->Montage_JumpToSection(sections[randomIndex], swordAttackMontage);
 
 	}
+}
+
+void AWarrior::AttackEnd()
+{
+	actionState = ECharacterActionState::ECAS_Unoccupied;
 }
 
 void AWarrior::Tick(float DeltaTime)
@@ -112,7 +126,7 @@ void AWarrior::EKeyPressed()
 {
 	AWeapon* weapon = Cast<AWeapon>(overlappingItem);
 	if (weapon) {
-		characterState = ECharacterWeaponEquipState::ECWES_Equipped;
+		characterWeaponState = ECharacterWeaponEquipState::ECWES_Equipped;
 		weapon->Equip(GetMesh(), FName("WeaponSocketR"));
 	}
 }
