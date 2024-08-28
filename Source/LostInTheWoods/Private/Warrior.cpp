@@ -44,22 +44,17 @@ void AWarrior::Attack()
 
 void AWarrior::PlayAttackMontage()
 {
-	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 	int32 randomIndex = FMath::RandRange(0, 1);
 
 	TArray<FName> sections;
 	sections.Add("Attack1");
 	sections.Add("Attack2");
+	PlayMontage(swordAttackMontage, sections[randomIndex]);
 
-	if (animInstance)
-	{
-		animInstance->Montage_Play(swordAttackMontage);
-		animInstance->Montage_JumpToSection(sections[randomIndex], swordAttackMontage);
-
-	}
+	
 }
 
-void AWarrior::AttackEnd()
+void AWarrior::SetPlayerActionToUnoccupied()
 {
 	actionState = ECharacterActionState::ECAS_Unoccupied;
 }
@@ -124,6 +119,28 @@ bool AWarrior::CanAttack()
 	return actionState == ECharacterActionState::ECAS_Unoccupied && characterWeaponState == ECharacterWeaponEquipState::ECWES_Equipped;
 }
 
+bool AWarrior::CanDisarm()
+{
+	return  inHandWeapon && characterWeaponState == ECharacterWeaponEquipState::ECWES_Equipped && actionState==ECharacterActionState::ECAS_Unoccupied;
+}
+
+bool AWarrior::CanEquipWeapon()
+{
+	return  inHandWeapon && characterWeaponState != ECharacterWeaponEquipState::ECWES_Equipped && actionState == ECharacterActionState::ECAS_Unoccupied;
+}
+
+void AWarrior::PlayMontage(UAnimMontage* montage, FName SectionName)
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+
+	if (animInstance)
+	{
+		animInstance->Montage_Play(swordEquipMontage);
+		animInstance->Montage_JumpToSection(SectionName, montage);
+
+	}
+}
+
 
 //public functions
 
@@ -132,9 +149,48 @@ void AWarrior::EKeyPressed()
 	AWeapon* weapon = Cast<AWeapon>(overlappingItem);
 	if (weapon) {
 		characterWeaponState = ECharacterWeaponEquipState::ECWES_Equipped;
+		inHandWeapon = weapon;
 		weapon->Equip(GetMesh(), FName("WeaponSocketR"));
+		overlappingItem = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("Overlaping weapon"));
 	}
+	else if (CanDisarm()) {
+
+		PlayMontage(swordEquipMontage, FName("Disarm"));
+		characterWeaponState = ECharacterWeaponEquipState::ECWES_UnEquipped;
+		actionState = ECharacterActionState::ECAS_DisarmWeapon;
+	}
+	else if (CanEquipWeapon()) {
+		PlayMontage(swordEquipMontage, FName("Equip"));
+		characterWeaponState = ECharacterWeaponEquipState::ECWES_Equipped;
+		actionState = ECharacterActionState::ECAS_EquipingWeapon;
+
+	}
+		
+
 }
+
+void AWarrior::EquipWeaponFromBack()
+{
+	AttachComponentToMesh(FName("WeaponSocketR"));
+}
+void AWarrior::Disarm()
+{
+	AttachComponentToMesh(FName("WeaponSocket"));
+}
+
+void AWarrior::AttachComponentToMesh(FName socketName)
+{
+	FAttachmentTransformRules attachmentTransferRules(EAttachmentRule::SnapToTarget, true);
+	inHandWeapon->AttachToComponent(GetMesh(), attachmentTransferRules, socketName );
+}
+
+
+
+
+
+
+
 
 // Called every frame
 

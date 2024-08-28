@@ -22,6 +22,7 @@ public:
 
 	//Input Function start
 	void EKeyPressed();
+	
 	//Input Function End
 
 	FORCEINLINE ECharacterWeaponEquipState GetCharacterState() { return characterWeaponState; }
@@ -39,6 +40,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* swordAttackMontage;
 
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* swordEquipMontage;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -47,7 +51,7 @@ protected:
 	//Montage section
 	void PlayAttackMontage();
 	UFUNCTION(BlueprintCallable)
-	void AttackEnd();
+	void SetPlayerActionToUnoccupied();
 
 
 private:
@@ -84,7 +88,16 @@ private:
 
 	//AttackFunction
 	bool CanAttack();
+	bool CanDisarm();
+	bool CanEquipWeapon();
 	
+	void PlayMontage(UAnimMontage* montage, FName SectionName);
+	UFUNCTION(BlueprintCallable)
+	void EquipWeaponFromBack();
+	void AttachComponentToMesh(FName socketName);
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+
 
 
 };
