@@ -35,19 +35,28 @@ void AWarrior::BeginPlay()
 
 void AWarrior::Attack()
 {
-	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	
+	if (CanAttack()) {
+		PlayAttackMontage();
+		actionState = ECharacterActionState::ECAS_Attacking;
+	}
+}
+
+void AWarrior::PlayAttackMontage()
+{
 	int32 randomIndex = FMath::RandRange(0, 1);
 
 	TArray<FName> sections;
 	sections.Add("Attack1");
 	sections.Add("Attack2");
+	PlayMontage(swordAttackMontage, sections[randomIndex]);
 
-	if (animInstance)
-	{
-		animInstance->Montage_Play(swordAttackMontage);
-		animInstance->Montage_JumpToSection(sections[randomIndex], swordAttackMontage);
+	
+}
 
-	}
+void AWarrior::SetPlayerActionToUnoccupied()
+{
+	actionState = ECharacterActionState::ECAS_Unoccupied;
 }
 
 void AWarrior::Tick(float DeltaTime)
@@ -73,7 +82,7 @@ void AWarrior::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AWarrior::MoveForward(float value)
 {
-	if (Controller&& value != 0) {
+	if (Controller&& value != 0 && actionState== ECharacterActionState::ECAS_Unoccupied) {
 		FRotator controllerRotation = Controller->GetControlRotation();//COntroller does have forward vector, sp we are taking controllers rotation
 		FRotator yawRotation(0.f, controllerRotation.Yaw, 0.f);
 
@@ -86,7 +95,7 @@ void AWarrior::MoveForward(float value)
 
 void AWarrior::MoveRight(float value)
 {
-	if (Controller && value != 0) {
+	if (Controller && value != 0 && actionState == ECharacterActionState::ECAS_Unoccupied) {
 		FRotator controllerRotation = Controller->GetControlRotation();
 		FRotator yawRotation(0.f, controllerRotation.Yaw, 0.f);
 		FVector rightVector= FRotationMatrix(yawRotation).GetUnitAxis(EAxis::Y);
@@ -105,6 +114,33 @@ void AWarrior::LookUp(float value)
 	AddControllerPitchInput(value);
 }
 
+bool AWarrior::CanAttack()
+{
+	return actionState == ECharacterActionState::ECAS_Unoccupied && characterWeaponState == ECharacterWeaponEquipState::ECWES_Equipped;
+}
+
+bool AWarrior::CanDisarm()
+{
+	return  inHandWeapon && characterWeaponState == ECharacterWeaponEquipState::ECWES_Equipped && actionState==ECharacterActionState::ECAS_Unoccupied;
+}
+
+bool AWarrior::CanEquipWeapon()
+{
+	return  inHandWeapon && characterWeaponState != ECharacterWeaponEquipState::ECWES_Equipped && actionState == ECharacterActionState::ECAS_Unoccupied;
+}
+
+void AWarrior::PlayMontage(UAnimMontage* montage, FName SectionName)
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+
+	if (animInstance)
+	{
+		animInstance->Montage_Play(swordEquipMontage);
+		animInstance->Montage_JumpToSection(SectionName, montage);
+
+	}
+}
+
 
 //public functions
 
@@ -112,10 +148,49 @@ void AWarrior::EKeyPressed()
 {
 	AWeapon* weapon = Cast<AWeapon>(overlappingItem);
 	if (weapon) {
-		characterState = ECharacterWeaponEquipState::ECWES_Equipped;
+		characterWeaponState = ECharacterWeaponEquipState::ECWES_Equipped;
+		inHandWeapon = weapon;
 		weapon->Equip(GetMesh(), FName("WeaponSocketR"));
+		overlappingItem = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("Overlaping weapon"));
 	}
+	else if (CanDisarm()) {
+
+		PlayMontage(swordEquipMontage, FName("Disarm"));
+		characterWeaponState = ECharacterWeaponEquipState::ECWES_UnEquipped;
+		actionState = ECharacterActionState::ECAS_DisarmWeapon;
+	}
+	else if (CanEquipWeapon()) {
+		PlayMontage(swordEquipMontage, FName("Equip"));
+		characterWeaponState = ECharacterWeaponEquipState::ECWES_Equipped;
+		actionState = ECharacterActionState::ECAS_EquipingWeapon;
+
+	}
+		
+
 }
+
+void AWarrior::EquipWeaponFromBack()
+{
+	AttachComponentToMesh(FName("WeaponSocketR"));
+}
+void AWarrior::Disarm()
+{
+	AttachComponentToMesh(FName("WeaponSocket"));
+}
+
+void AWarrior::AttachComponentToMesh(FName socketName)
+{
+	FAttachmentTransformRules attachmentTransferRules(EAttachmentRule::SnapToTarget, true);
+	inHandWeapon->AttachToComponent(GetMesh(), attachmentTransferRules, socketName );
+}
+
+
+
+
+
+
+
 
 // Called every frame
 

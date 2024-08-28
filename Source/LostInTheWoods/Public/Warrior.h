@@ -22,9 +22,10 @@ public:
 
 	//Input Function start
 	void EKeyPressed();
+	
 	//Input Function End
 
-	FORCEINLINE ECharacterWeaponEquipState GetCharacterState() { return characterState; }
+	FORCEINLINE ECharacterWeaponEquipState GetCharacterState() { return characterWeaponState; }
 
 	FORCEINLINE void SetOverlapingItem(class AItem* item){ overlappingItem= item;}
 
@@ -35,10 +36,22 @@ protected:
 
 	class AItem* overlappingItem;
 
+	//Monatge section
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* swordAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* swordEquipMontage;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void Attack();
+
+	//Montage section
+	void PlayAttackMontage();
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerActionToUnoccupied();
 
 
 private:
@@ -55,10 +68,13 @@ private:
 
 
 	UPROPERTY(VisibleAnywhere, Category = Combat)
-	ECharacterWeaponEquipState characterState= ECharacterWeaponEquipState::ECWES_UnEquipped;
+	ECharacterWeaponEquipState characterWeaponState= ECharacterWeaponEquipState::ECWES_UnEquipped;
 
-	UPROPERTY(EditAnywhere, Category= Combat)
-	UAnimMontage* swordAttackMontage;
+
+	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess= "true"), Category = Combat)
+	ECharacterActionState actionState = ECharacterActionState::ECAS_Unoccupied;
 
 
 
@@ -69,7 +85,19 @@ private:
 	void LookUp(float value);
 	
 	//input functions end
+
+	//AttackFunction
+	bool CanAttack();
+	bool CanDisarm();
+	bool CanEquipWeapon();
 	
+	void PlayMontage(UAnimMontage* montage, FName SectionName);
+	UFUNCTION(BlueprintCallable)
+	void EquipWeaponFromBack();
+	void AttachComponentToMesh(FName socketName);
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+
 
 
 };

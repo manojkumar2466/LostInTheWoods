@@ -3,6 +3,7 @@
 
 #include "Items/Weapon.h"
 #include "Warrior.h"
+#include "Components/SphereComponent.h"
 
 AWeapon::AWeapon()
 {
@@ -10,9 +11,10 @@ AWeapon::AWeapon()
 
 void AWeapon::Equip(USceneComponent* parentMesh, FName socketName)
 {
-	bStopHovering = true;
+	weaponState = EWeaponState::EWS_Equiped;
 	FAttachmentTransformRules attachmentRules(EAttachmentRule::SnapToTarget, true);
 	mesh->AttachToComponent(parentMesh, attachmentRules, FName("WeaponSocketR"));
+	sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AWeapon::OnSphereOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

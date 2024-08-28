@@ -47,7 +47,7 @@ void AItem::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor*
 // Called every frame
 void AItem::Tick(float DeltaTime)
 {
-	if (!bStopHovering) {
+	if (weaponState==EWeaponState::EWS_Hovering) {
 		sinValue += DeltaTime;
 		float deltaZ = sinAmplitude * FMath::Sin(waveSpeed * sinValue);
 		Super::Tick(DeltaTime);

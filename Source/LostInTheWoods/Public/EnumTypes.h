@@ -12,5 +12,14 @@ UENUM(BlueprintType)
 enum class ECharacterActionState : uint8
 {
 	ECAS_Unoccupied UMETA(DisplayName="Unoccupied"),
-	ECAS_Attacking UMETA(DisplayName="Attacking")
+	ECAS_Attacking UMETA(DisplayName="Attacking"),
+	ECAS_EquipingWeapon UMETA(DisplayName="Equiping weapon"),
+	ECAS_DisarmWeapon UMETA(DisplayName = "Equiping weapon")
+};
+
+UENUM(BlueprintType)
+enum class EWeaponState : uint8
+{
+	EWS_Hovering,
+	EWS_Equiped
 };
