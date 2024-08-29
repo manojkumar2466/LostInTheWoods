@@ -53,6 +53,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerActionToUnoccupied();
 
+	UFUNCTION(BlueprintCallable)
+	void HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType);
+
 
 private:
 
