@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Interfaces/DamagableInterface.h"
 
 AWeapon::AWeapon()
 {
@@ -81,5 +82,11 @@ void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor
 		hitResult,
 		true
 		);
+
+	if (hitResult.GetActor())
+	{
+		IDamagableInterface* hitActor = Cast<IDamagableInterface>(hitResult.GetActor());
+		hitActor->GetHit(hitResult.ImpactPoint);
+	}
 
 }

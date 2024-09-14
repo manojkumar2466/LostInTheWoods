@@ -71,6 +71,11 @@ void AWarrior::Tick(float DeltaTime)
 
 }
 
+void AWarrior::GetHit(const FVector& impactPoint)
+{
+	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
+}
+
 // Called to bind functionality to input
 void AWarrior::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
