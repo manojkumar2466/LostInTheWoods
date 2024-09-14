@@ -7,6 +7,7 @@
 #include "Items/Item.h"
 #include "Items/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 AWarrior::AWarrior()
@@ -59,10 +60,20 @@ void AWarrior::SetPlayerActionToUnoccupied()
 	actionState = ECharacterActionState::ECAS_Unoccupied;
 }
 
+void AWarrior::HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType)
+{
+	inHandWeapon->GetWeaponBoxCollider()->SetCollisionEnabled(collisionType);
+}
+
 void AWarrior::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AWarrior::GetHit(const FVector& impactPoint)
+{
+	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
 }
 
 // Called to bind functionality to input
@@ -135,7 +146,7 @@ void AWarrior::PlayMontage(UAnimMontage* montage, FName SectionName)
 
 	if (animInstance)
 	{
-		animInstance->Montage_Play(swordEquipMontage);
+		animInstance->Montage_Play(montage);
 		animInstance->Montage_JumpToSection(SectionName, montage);
 
 	}
@@ -188,9 +199,4 @@ void AWarrior::AttachComponentToMesh(FName socketName)
 
 
 
-
-
-
-
-// Called every frame
 

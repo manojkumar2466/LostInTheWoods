@@ -6,11 +6,12 @@
 #include "GameFramework/Character.h"
 #include "Interfaces/Pickup.h"
 #include "EnumTypes.h"
+#include "Interfaces/DamagableInterface.h"
 #include "Warrior.generated.h"
 
 
 UCLASS()
-class LOSTINTHEWOODS_API AWarrior : public ACharacter, public IPickup
+class LOSTINTHEWOODS_API AWarrior : public ACharacter, public IPickup, public IDamagableInterface
 {
 	GENERATED_BODY()
 
@@ -29,6 +30,9 @@ public:
 
 	FORCEINLINE void SetOverlapingItem(class AItem* item){ overlappingItem= item;}
 
+
+	//HitInterface
+	virtual void GetHit(const FVector& impactPoint) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -52,6 +56,9 @@ protected:
 	void PlayAttackMontage();
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerActionToUnoccupied();
+
+	UFUNCTION(BlueprintCallable)
+	void HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType);
 
 
 private:
