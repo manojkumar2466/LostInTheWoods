@@ -17,6 +17,8 @@ public:
 
 	AWeapon();
 
+	TArray<AActor*> ignoreActors;
+
 	void Equip(USceneComponent* parentMesh, FName socketName);
 
 	FORCEINLINE class UBoxComponent* GetWeaponBoxCollider() { return boxCollider; }
