@@ -63,6 +63,9 @@ void AWarrior::SetPlayerActionToUnoccupied()
 void AWarrior::HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType)
 {
 	inHandWeapon->GetWeaponBoxCollider()->SetCollisionEnabled(collisionType);
+	if (collisionType == ECollisionEnabled::NoCollision) {
+		inHandWeapon->ignoreActors.Empty();
+	}
 }
 
 void AWarrior::Tick(float DeltaTime)

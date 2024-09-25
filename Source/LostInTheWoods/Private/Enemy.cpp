@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -21,7 +22,12 @@ AEnemy::AEnemy()
 
 void AEnemy::GetHit(const FVector& impactPoint)
 {
-	HitDirection( impactPoint);
+	HitDirection(impactPoint);
+	if (hitFleshSFX)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, hitFleshSFX, impactPoint);
+	}
+	if (bloodVFX) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bloodVFX, impactPoint);
 	
 	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
 }
@@ -61,7 +67,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AEnemy::HitDirection(FVector impactPoint)
+void AEnemy::HitDirection(const FVector& impactPoint)
 {
 	FVector forwardVector = GetActorForwardVector();
 	FVector toHit = (impactPoint - GetActorLocation()).GetSafeNormal();

@@ -28,6 +28,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category= Montage)
 	UAnimMontage* hitReactMontage;
 
+	UPROPERTY(EditAnywhere, Category= SFX)
+	USoundBase* hitFleshSFX;
+	UPROPERTY(EditAnywhere, Category = VFX)
+
+	UParticleSystem* bloodVFX;
+
 	void PlayHitReactMonatge();
 	void PlayMontage(UAnimMontage* montage, FName sectionName);
 
@@ -39,5 +45,5 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	void HitDirection( FVector impactPoint);
+	void HitDirection(const FVector& hitResult);
 };
