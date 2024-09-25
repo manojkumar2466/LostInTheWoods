@@ -17,7 +17,7 @@ public:
 	AEnemy();
 
 	//Interfaces
-	virtual void GetHit(const FVector& impactPoint) override;
+	virtual void GetHit_Implementation(const FVector& impactPoint) override;
 
 protected:
 	// Called when the game starts or when spawned

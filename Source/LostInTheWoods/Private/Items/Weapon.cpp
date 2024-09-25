@@ -89,7 +89,7 @@ void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		IDamagableInterface* hitActor = Cast<IDamagableInterface>(hitResult.GetActor());
 		if (hitActor) {
-			hitActor->GetHit(hitResult.ImpactPoint);
+			hitActor->Execute_GetHit(hitResult.GetActor(),hitResult.ImpactPoint);
 		}		
 		ignoreActors.AddUnique(hitResult.GetActor());
 	}

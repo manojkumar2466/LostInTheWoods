@@ -20,7 +20,7 @@ AEnemy::AEnemy()
 
 }
 
-void AEnemy::GetHit(const FVector& impactPoint)
+void AEnemy::GetHit_Implementation(const FVector& impactPoint)
 {
 	HitDirection(impactPoint);
 	if (hitFleshSFX)
