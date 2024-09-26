@@ -164,7 +164,7 @@ void AWarrior::EKeyPressed()
 	if (weapon) {
 		characterWeaponState = ECharacterWeaponEquipState::ECWES_Equipped;
 		inHandWeapon = weapon;
-		weapon->Equip(GetMesh(), FName("WeaponSocketR"));
+		weapon->Equip(GetMesh(), FName("WeaponSocketR"), this, this);
 		overlappingItem = nullptr;
 		UE_LOG(LogTemp, Warning, TEXT("Overlaping weapon"));
 	}

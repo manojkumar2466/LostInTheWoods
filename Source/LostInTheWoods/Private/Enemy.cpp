@@ -5,6 +5,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/HealthComponent.h"
+#include "HUD/HealthBarWidgetComponent.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -17,6 +19,11 @@ AEnemy::AEnemy()
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
+
+	healthComponent = CreateDefaultSubobject <UHealthComponent >(TEXT("HealthComp"));
+
+	healthBarWidgetComponet = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBarWidgetComp"));
+	healthBarWidgetComponet->SetupAttachment(GetRootComponent());
 
 }
 
@@ -98,5 +105,17 @@ void AEnemy::HitDirection(const FVector& impactPoint)
 	}
 	PlayMontage(hitReactMontage, hitReactionSectionName);
 
+}
+
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (healthComponent && healthBarWidgetComponet) {
+
+		healthComponent->ReceiveDamage(DamageAmount);
+		healthBarWidgetComponet->SetHealthBarPercent(healthComponent->GetHealthPercent());
+
+	}
+	
+	return DamageAmount;
 }
 

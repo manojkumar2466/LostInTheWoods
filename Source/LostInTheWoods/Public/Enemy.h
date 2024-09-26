@@ -46,4 +46,14 @@ public:
 
 private:
 	void HitDirection(const FVector& hitResult);
+	
+	UPROPERTY(VisibleAnywhere)
+	class UHealthComponent* healthComponent;
+	 
+	UPROPERTY(EditAnywhere)
+	class UHealthBarWidgetComponent* healthBarWidgetComponet;
+
+public:
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 };
