@@ -5,6 +5,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/HealthComponent.h"
+#include "HUD/HealthBarWidgetComponent.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -18,11 +20,25 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
+	healthComponent = CreateDefaultSubobject <UHealthComponent >(TEXT("HealthComp"));
+
+	healthBarWidgetComponet = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBarWidgetComp"));
+	healthBarWidgetComponet->SetupAttachment(GetRootComponent()); 
+
 }
 
-void AEnemy::GetHit(const FVector& impactPoint)
+void AEnemy::GetHit_Implementation(const FVector& impactPoint)
 {
-	HitDirection(impactPoint);
+	if (healthComponent && healthComponent->IsAlive())
+	{
+		HitDirection(impactPoint);
+	}
+	else
+	{
+		
+		PlayDeathMontage();
+	}
+	
 	if (hitFleshSFX)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, hitFleshSFX, impactPoint);
@@ -42,6 +58,20 @@ void AEnemy::BeginPlay()
 void AEnemy::PlayHitReactMonatge()
 {
 	PlayMontage(hitReactMontage, FName("FromBack"));
+}
+
+void AEnemy::PlayDeathMontage()
+{
+	TArray<FName> sections;
+	sections.Add("Death1");
+	sections.Add("Death2");
+	sections.Add("Death3");
+	
+	int sectionIndex = FMath::FRandRange(0, 2);
+
+	//TEnumAsByte<EDeathStatus> Pose(sectionIndex+1);
+	characterDeathStatus = StaticCast<EDeathStatus>(sectionIndex + 1);
+	PlayMontage(deathMontage, sections[sectionIndex]);
 }
 
 void AEnemy::PlayMontage(UAnimMontage* montage, FName sectionName)
@@ -98,5 +128,17 @@ void AEnemy::HitDirection(const FVector& impactPoint)
 	}
 	PlayMontage(hitReactMontage, hitReactionSectionName);
 
+}
+
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (healthComponent && healthBarWidgetComponet) {
+
+		healthComponent->ReceiveDamage(DamageAmount);
+		healthBarWidgetComponet->SetHealthBarPercent(healthComponent->GetHealthPercent());
+
+	}
+	
+	return DamageAmount;
 }
 

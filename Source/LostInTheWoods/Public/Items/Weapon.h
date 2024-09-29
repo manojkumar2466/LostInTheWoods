@@ -19,7 +19,7 @@ public:
 
 	TArray<AActor*> ignoreActors;
 
-	void Equip(USceneComponent* parentMesh, FName socketName);
+	void Equip(USceneComponent* parentMesh, FName socketName, AActor* newOwner, APawn* newInstigator);
 
 	FORCEINLINE class UBoxComponent* GetWeaponBoxCollider() { return boxCollider; }
 
@@ -44,4 +44,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* endTrace;
+
+	UPROPERTY(EditAnywhere)
+	float damage = 20.f;
 };

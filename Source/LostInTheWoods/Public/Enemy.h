@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/DamagableInterface.h"
+#include "EnumTypes.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -17,7 +18,7 @@ public:
 	AEnemy();
 
 	//Interfaces
-	virtual void GetHit(const FVector& impactPoint) override;
+	virtual void GetHit_Implementation(const FVector& impactPoint) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,13 +29,20 @@ protected:
 	UPROPERTY(EditAnywhere, Category= Montage)
 	UAnimMontage* hitReactMontage;
 
+	UPROPERTY(EditAnywhere, Category = Montage)
+	UAnimMontage* deathMontage;
+
 	UPROPERTY(EditAnywhere, Category= SFX)
 	USoundBase* hitFleshSFX;
 	UPROPERTY(EditAnywhere, Category = VFX)
 
 	UParticleSystem* bloodVFX;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EDeathStatus characterDeathStatus = EDeathStatus::EDS_Alive;
+
 	void PlayHitReactMonatge();
+	void PlayDeathMontage();
 	void PlayMontage(UAnimMontage* montage, FName sectionName);
 
 public:	
@@ -46,4 +54,14 @@ public:
 
 private:
 	void HitDirection(const FVector& hitResult);
+	
+	UPROPERTY(VisibleAnywhere)
+	class UHealthComponent* healthComponent;
+	 
+	UPROPERTY(EditAnywhere)
+	class UHealthBarWidgetComponent* healthBarWidgetComponet;
+
+public:
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 };

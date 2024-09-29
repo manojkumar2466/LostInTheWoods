@@ -74,7 +74,7 @@ void AWarrior::Tick(float DeltaTime)
 
 }
 
-void AWarrior::GetHit(const FVector& impactPoint)
+void AWarrior::GetHit_Implementation(const FVector& impactPoint)
 {
 	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
 }
@@ -164,7 +164,7 @@ void AWarrior::EKeyPressed()
 	if (weapon) {
 		characterWeaponState = ECharacterWeaponEquipState::ECWES_Equipped;
 		inHandWeapon = weapon;
-		weapon->Equip(GetMesh(), FName("WeaponSocketR"));
+		weapon->Equip(GetMesh(), FName("WeaponSocketR"), this, this);
 		overlappingItem = nullptr;
 		UE_LOG(LogTemp, Warning, TEXT("Overlaping weapon"));
 	}

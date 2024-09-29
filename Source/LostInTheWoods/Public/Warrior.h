@@ -32,7 +32,7 @@ public:
 
 
 	//HitInterface
-	virtual void GetHit(const FVector& impactPoint) override;
+	virtual void GetHit_Implementation(const FVector& impactPoint) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

@@ -23,5 +23,6 @@ class LOSTINTHEWOODS_API IDamagableInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	virtual void GetHit(const FVector& impactPoint) = 0;
+	UFUNCTION(BlueprintNativeEvent)
+	void GetHit(const FVector& impactPoint);
 };

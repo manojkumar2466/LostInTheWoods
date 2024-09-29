@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/DamagableInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 AWeapon::AWeapon()
 {
@@ -24,8 +25,10 @@ AWeapon::AWeapon()
 	 
 }
 
-void AWeapon::Equip(USceneComponent* parentMesh, FName socketName)
+void AWeapon::Equip(USceneComponent* parentMesh, FName socketName, AActor* newOwner, APawn* newInstigator)
 {
+	SetOwner(newOwner);
+	SetInstigator(newInstigator);
 	weaponState = EWeaponState::EWS_Equiped;
 	FAttachmentTransformRules attachmentRules(EAttachmentRule::SnapToTarget, true);
 	mesh->AttachToComponent(parentMesh, attachmentRules, FName("WeaponSocketR"));
@@ -89,7 +92,13 @@ void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		IDamagableInterface* hitActor = Cast<IDamagableInterface>(hitResult.GetActor());
 		if (hitActor) {
-			hitActor->GetHit(hitResult.ImpactPoint);
+			UGameplayStatics::ApplyDamage(
+				hitResult.GetActor(),
+				damage, GetInstigator()->GetController(),
+				this,
+				UDamageType::StaticClass());
+			hitActor->Execute_GetHit(hitResult.GetActor(),hitResult.ImpactPoint);
+			
 		}		
 		ignoreActors.AddUnique(hitResult.GetActor());
 	}
