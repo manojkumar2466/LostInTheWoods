@@ -23,3 +23,12 @@ enum class EWeaponState : uint8
 	EWS_Hovering,
 	EWS_Equiped
 };
+
+UENUM(BlueprintType)
+enum class EDeathStatus : uint8
+{
+	EDS_Alive UMETA(DisplayName = "Alive"),
+	EDS_DeathPose1 UMETA(DisplayName = "Deathpose1"),
+	EDS_DeathPose2 UMETA(DisplayName = "Deathpose2"),
+	EDS_DeathPose3 UMETA(DisplayName = "Deathpose3")
+};

@@ -92,12 +92,13 @@ void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		IDamagableInterface* hitActor = Cast<IDamagableInterface>(hitResult.GetActor());
 		if (hitActor) {
-			hitActor->Execute_GetHit(hitResult.GetActor(),hitResult.ImpactPoint);
 			UGameplayStatics::ApplyDamage(
 				hitResult.GetActor(),
 				damage, GetInstigator()->GetController(),
 				this,
 				UDamageType::StaticClass());
+			hitActor->Execute_GetHit(hitResult.GetActor(),hitResult.ImpactPoint);
+			
 		}		
 		ignoreActors.AddUnique(hitResult.GetActor());
 	}

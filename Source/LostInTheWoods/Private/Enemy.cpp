@@ -23,13 +23,22 @@ AEnemy::AEnemy()
 	healthComponent = CreateDefaultSubobject <UHealthComponent >(TEXT("HealthComp"));
 
 	healthBarWidgetComponet = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBarWidgetComp"));
-	healthBarWidgetComponet->SetupAttachment(GetRootComponent());
+	healthBarWidgetComponet->SetupAttachment(GetRootComponent()); 
 
 }
 
 void AEnemy::GetHit_Implementation(const FVector& impactPoint)
 {
-	HitDirection(impactPoint);
+	if (healthComponent && healthComponent->IsAlive())
+	{
+		HitDirection(impactPoint);
+	}
+	else
+	{
+		
+		PlayDeathMontage();
+	}
+	
 	if (hitFleshSFX)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, hitFleshSFX, impactPoint);
@@ -49,6 +58,20 @@ void AEnemy::BeginPlay()
 void AEnemy::PlayHitReactMonatge()
 {
 	PlayMontage(hitReactMontage, FName("FromBack"));
+}
+
+void AEnemy::PlayDeathMontage()
+{
+	TArray<FName> sections;
+	sections.Add("Death1");
+	sections.Add("Death2");
+	sections.Add("Death3");
+	
+	int sectionIndex = FMath::FRandRange(0, 2);
+
+	//TEnumAsByte<EDeathStatus> Pose(sectionIndex+1);
+	characterDeathStatus = StaticCast<EDeathStatus>(sectionIndex + 1);
+	PlayMontage(deathMontage, sections[sectionIndex]);
 }
 
 void AEnemy::PlayMontage(UAnimMontage* montage, FName sectionName)
