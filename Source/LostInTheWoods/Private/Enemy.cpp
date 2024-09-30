@@ -31,12 +31,13 @@ void AEnemy::GetHit_Implementation(const FVector& impactPoint)
 {
 	if (healthComponent && healthComponent->IsAlive())
 	{
+		HandleHealthBarWidgetVisibility(true);
 		HitDirection(impactPoint);
 	}
 	else
 	{
 		
-		PlayDeathMontage();
+		OnDeath();
 	}
 	
 	if (hitFleshSFX)
@@ -52,6 +53,8 @@ void AEnemy::GetHit_Implementation(const FVector& impactPoint)
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	HandleHealthBarWidgetVisibility(false);
 	
 }
 
@@ -83,10 +86,38 @@ void AEnemy::PlayMontage(UAnimMontage* montage, FName sectionName)
 	}
 }
 
+void AEnemy::OnDeath()
+{
+	PlayDeathMontage();
+	HandleHealthBarWidgetVisibility(false);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AEnemy::HandleHealthBarWidgetVisibility(bool isVisible)
+{
+	if (healthBarWidgetComponet)
+	{
+		healthBarWidgetComponet->SetVisibility(isVisible);
+	}
+}
+
 // Called every frame
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (combatTarget) {
+		double distance = (combatTarget->GetActorLocation() - GetActorLocation()).Size();
+
+		if (distance > CombatRadius)
+		{
+			combatTarget = nullptr;
+			HandleHealthBarWidgetVisibility(false);
+		}
+	
+	}
+	
+	
 
 }
 
@@ -136,7 +167,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 		healthComponent->ReceiveDamage(DamageAmount);
 		healthBarWidgetComponet->SetHealthBarPercent(healthComponent->GetHealthPercent());
-
+		combatTarget = EventInstigator->GetPawn();
 	}
 	
 	return DamageAmount;
