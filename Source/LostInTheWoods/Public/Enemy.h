@@ -17,40 +17,23 @@ public:
 	// Sets default values for this character's properties
 	AEnemy();
 
-	//Interfaces
-	virtual void GetHit_Implementation(const FVector& impactPoint) override;
+	
+	
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//Montage section
-
-	UPROPERTY(EditAnywhere, Category= Montage)
-	UAnimMontage* hitReactMontage;
-
-	UPROPERTY(EditAnywhere, Category = Montage)
-	UAnimMontage* deathMontage;
-
-	UPROPERTY(EditAnywhere, Category= SFX)
-	USoundBase* hitFleshSFX;
-	UPROPERTY(EditAnywhere, Category = VFX)
-
-	UParticleSystem* bloodVFX;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EDeathStatus characterDeathStatus = EDeathStatus::EDS_Alive;
-
-	void PlayHitReactMonatge();
-	void PlayDeathMontage();
-	void PlayMontage(UAnimMontage* montage, FName sectionName);
-
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+	
+
 
 private:
 	void HitDirection(const FVector& hitResult);
@@ -61,7 +44,39 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UHealthBarWidgetComponent* healthBarWidgetComponet;
 
+	AActor* combatTarget;
+
+
+protected:
+
+	UPROPERTY(EditAnywhere, Category = Montage)
+	UAnimMontage* hitReactMontage;
+
+	UPROPERTY(EditAnywhere, Category = Montage)
+	UAnimMontage* deathMontage;
+
+	UPROPERTY(EditAnywhere, Category = SFX)
+	USoundBase* hitFleshSFX;
+	UPROPERTY(EditAnywhere, Category = VFX)
+
+	UParticleSystem* bloodVFX;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EDeathStatus characterDeathStatus = EDeathStatus::EDS_Alive;
+
+	double CombatRadius = 500.f;
+
+	void PlayHitReactMonatge();
+	void PlayDeathMontage();
+	void PlayMontage(UAnimMontage* montage, FName sectionName);
+	void OnDeath();
+	void HandleHealthBarWidgetVisibility(bool isVisible);
+
+
+
+
 public:
+	virtual void GetHit_Implementation(const FVector& impactPoint) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 };
