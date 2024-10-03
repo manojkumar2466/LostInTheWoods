@@ -8,6 +8,8 @@
 #include "Components/HealthComponent.h"
 #include "HUD/HealthBarWidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AIController.h"
+#include "Perception/PawnSensingComponent.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -30,6 +32,15 @@ AEnemy::AEnemy()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
+
+	pawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
+
+	if (pawnSensing)
+	{
+		pawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::OnPawnSeen);
+		pawnSensing->SightRadius = 4000.f;
+		pawnSensing->SetPeripheralVisionAngle(75.f);
+	}
 }
 
 void AEnemy::GetHit_Implementation(const FVector& impactPoint)
@@ -60,6 +71,9 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	HandleHealthBarWidgetVisibility(false);
+	AIController = Cast<AAIController>(GetController());
+
+	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
 	
 }
 
@@ -111,16 +125,22 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (combatTarget) {
-		double distance = (combatTarget->GetActorLocation() - GetActorLocation()).Size();
-
-		if (distance > CombatRadius)
-		{
-			combatTarget = nullptr;
-			HandleHealthBarWidgetVisibility(false);
-		}
-	
+	if (!IsInRange(combatTarget, CombatRadius))
+	{
+		 combatTarget = nullptr;			
+		 HandleHealthBarWidgetVisibility(false);
 	}
+	
+	if (IsInRange(patrolTarget, patrolRadius))
+	{
+		ChangePatrolPoint();
+		GetWorldTimerManager().SetTimer(patrolTimer, this, &AEnemy::OnPatrolTimerFinished, FMath::RandRange(1.f,5.f));
+		
+	}
+
+	
+		
+	
 	
 	
 
@@ -164,6 +184,56 @@ void AEnemy::HitDirection(const FVector& impactPoint)
 	}
 	PlayMontage(hitReactMontage, hitReactionSectionName);
 
+}
+
+bool AEnemy::IsInRange(AActor* target, double radius)
+{
+	if (!target)
+	{
+		return false;
+	}
+	double distance = (target->GetActorLocation() - GetActorLocation()).Size();
+	return distance<radius;
+}
+
+void AEnemy::ChangePatrolPoint()
+{
+	TArray<AActor*> nextPatrolPointsTargetList;
+	for (auto newPatrolPoint : patrolTargetPoints)
+	{
+		if (newPatrolPoint != patrolTarget) {
+
+			nextPatrolPointsTargetList.AddUnique(newPatrolPoint);
+		}
+	}
+
+	int patrolPointIndex = FMath::RandRange(0, nextPatrolPointsTargetList.Num() - 1);
+
+	patrolTarget = nextPatrolPointsTargetList[patrolPointIndex];	
+	
+	
+}
+
+void AEnemy::MoveToTarget(AActor* targetActor, double acceptanceRadius)
+{
+	if (!AIController ||!targetActor)
+	{
+		return;
+	}
+	FAIMoveRequest moveRequest;
+	moveRequest.SetGoalActor(targetActor);
+	moveRequest.SetAcceptanceRadius(acceptanceRadius);
+	AIController->MoveTo(moveRequest);
+}
+
+void AEnemy::OnPatrolTimerFinished()
+{
+	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
+}
+
+void AEnemy::OnPawnSeen(APawn* Pawn)
+{
+	UE_LOG(LogTemp, Warning, TEXT("saw pawn"));
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

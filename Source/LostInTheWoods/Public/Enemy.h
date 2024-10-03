@@ -36,7 +36,7 @@ public:
 
 
 private:
-	void HitDirection(const FVector& hitResult);
+	
 	
 	UPROPERTY(VisibleAnywhere)
 	class UHealthComponent* healthComponent;
@@ -44,7 +44,43 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UHealthBarWidgetComponent* healthBarWidgetComponet;
 
+	UPROPERTY(VisibleAnywhere)
 	AActor* combatTarget;
+
+	UPROPERTY(EditAnywhere)
+	double CombatRadius = 500.f;
+
+	UPROPERTY(EditAnywhere)
+	AActor* patrolTarget;
+
+	UPROPERTY(EditAnywhere)
+	double patrolRadius = 100.f;
+
+	UPROPERTY(EditAnywhere)
+	double patrolAcceptanceRadius = 100.f;
+
+	UPROPERTY(EditAnywhere)
+	TArray<AActor*> patrolTargetPoints;
+
+	class AAIController* AIController;
+
+	FTimerHandle patrolTimer;
+
+	UPROPERTY(VisibleAnywhere)
+	class UPawnSensingComponent* pawnSensing;
+
+	void HitDirection(const FVector& hitResult);
+
+	bool IsInRange(AActor* target, double radius);
+
+	void ChangePatrolPoint();
+
+	void MoveToTarget(AActor* targetActor, double acceptanceRadius);
+
+	void OnPatrolTimerFinished();
+
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
 
 
 protected:
@@ -64,7 +100,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EDeathStatus characterDeathStatus = EDeathStatus::EDS_Alive;
 
-	double CombatRadius = 500.f;
+	
 
 	void PlayHitReactMonatge();
 	void PlayDeathMontage();
