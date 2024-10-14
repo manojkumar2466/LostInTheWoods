@@ -23,7 +23,7 @@ AEnemy::AEnemy()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
-	healthComponent = CreateDefaultSubobject <UHealthComponent >(TEXT("HealthComp"));
+	
 
 	healthBarWidgetComponet = CreateDefaultSubobject<UHealthBarWidgetComponent>(TEXT("HealthBarWidgetComp"));
 	healthBarWidgetComponet->SetupAttachment(GetRootComponent()); 
@@ -50,6 +50,7 @@ void AEnemy::BeginPlay()
 	HandleHealthBarWidgetVisibility(false);
 	AIController = Cast<AAIController>(GetController());
 
+	patrolTarget = patrolTargetPoints[FMath::RandRange(0, patrolTargetPoints.Num() - 1)];
 	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
 
 }
@@ -178,7 +179,7 @@ void AEnemy::HitDirection(const FVector& impactPoint)
 	else if (degrees < -45 && degrees >= -135) {
 		hitReactionSectionName = FName("FromLeft");
 	}
-	PlayMontage(hitReactMontage, hitReactionSectionName);
+	PlayHitReactMonatge(hitReactionSectionName);
 
 }
 
@@ -228,6 +229,7 @@ void AEnemy::OnPawnSeen(APawn* pawn)
 
 void AEnemy::OnDeath()
 {
+	Super::OnDeath();
 	PlayDeathMontage();
 	HandleHealthBarWidgetVisibility(false);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -245,13 +247,10 @@ void AEnemy::PatrolCheck()
 }
 
 
-void AEnemy::PlayHitReactMonatge()
-{
-	PlayMontage(hitReactMontage, FName("FromBack"));
-}
 
 void AEnemy::PlayDeathMontage()
 {
+	Super::SetPlayerDefaults();
 	TArray<FName> sections;
 	sections.Add("Death1");
 	sections.Add("Death2");
@@ -264,14 +263,7 @@ void AEnemy::PlayDeathMontage()
 	PlayMontage(deathMontage, sections[sectionIndex]);
 }
 
-void AEnemy::PlayMontage(UAnimMontage* montage, FName sectionName)
-{
-	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
-	if (animInstance) {
-		animInstance->Montage_Play(montage);
-		animInstance->Montage_JumpToSection(sectionName,montage);
-	}
-}
+
 
 
 

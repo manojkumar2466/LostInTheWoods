@@ -7,7 +7,6 @@
 #include "Items/Item.h"
 #include "Items/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Components/BoxComponent.h"
 
 // Sets default values
 AWarrior::AWarrior()
@@ -36,7 +35,7 @@ void AWarrior::BeginPlay()
 
 void AWarrior::Attack()
 {
-	
+	Super::Attack();
 	if (CanAttack()) {
 		PlayAttackMontage();
 		actionState = ECharacterActionState::ECAS_Attacking;
@@ -45,6 +44,7 @@ void AWarrior::Attack()
 
 void AWarrior::PlayAttackMontage()
 {
+	Super::PlayAttackMontage();
 	int32 randomIndex = FMath::RandRange(0, 1);
 
 	TArray<FName> sections;
@@ -60,13 +60,6 @@ void AWarrior::SetPlayerActionToUnoccupied()
 	actionState = ECharacterActionState::ECAS_Unoccupied;
 }
 
-void AWarrior::HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType)
-{
-	inHandWeapon->GetWeaponBoxCollider()->SetCollisionEnabled(collisionType);
-	if (collisionType == ECollisionEnabled::NoCollision) {
-		inHandWeapon->ignoreActors.Empty();
-	}
-}
 
 void AWarrior::Tick(float DeltaTime)
 {
@@ -130,6 +123,7 @@ void AWarrior::LookUp(float value)
 
 bool AWarrior::CanAttack()
 {
+	Super::CanAttack();
 	return actionState == ECharacterActionState::ECAS_Unoccupied && characterWeaponState == ECharacterWeaponEquipState::ECWES_Equipped;
 }
 
@@ -143,17 +137,7 @@ bool AWarrior::CanEquipWeapon()
 	return  inHandWeapon && characterWeaponState != ECharacterWeaponEquipState::ECWES_Equipped && actionState == ECharacterActionState::ECAS_Unoccupied;
 }
 
-void AWarrior::PlayMontage(UAnimMontage* montage, FName SectionName)
-{
-	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 
-	if (animInstance)
-	{
-		animInstance->Montage_Play(montage);
-		animInstance->Montage_JumpToSection(SectionName, montage);
-
-	}
-}
 
 
 //public functions
