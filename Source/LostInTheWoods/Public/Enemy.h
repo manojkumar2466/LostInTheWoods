@@ -48,7 +48,7 @@ private:
 	AActor* combatTarget;
 
 	UPROPERTY(EditAnywhere)
-	double CombatRadius = 500.f;
+	double chaseRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere)
 	AActor* patrolTarget;
@@ -60,6 +60,13 @@ private:
 	double patrolAcceptanceRadius = 100.f;
 
 	UPROPERTY(EditAnywhere)
+	double combatAcceptanceRadius = 50.f;
+
+	UPROPERTY(EditAnywhere)
+	double attackingRadius = 150.f;
+
+
+	UPROPERTY(EditAnywhere)
 	TArray<AActor*> patrolTargetPoints;
 
 	class AAIController* AIController;
@@ -68,6 +75,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UPawnSensingComponent* pawnSensing;
+
+	UPROPERTY(VisibleAnywhere)
+	EEnemyState currentState = EEnemyState::EES_Patrolling;
 
 	void HitDirection(const FVector& hitResult);
 
@@ -81,6 +91,12 @@ private:
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
+
+	void StartChasing(AActor* targetActor);
+
+	void CombatCheck();
+
+	void PatrolCheck();
 
 
 protected:
