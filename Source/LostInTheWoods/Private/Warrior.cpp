@@ -23,7 +23,7 @@ AWarrior::AWarrior()
 	springArm->SetupAttachment(GetRootComponent());
 	camera = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	camera->SetupAttachment(springArm);
-
+	Tags.Add(FName("Warrior"));
 
 }
 

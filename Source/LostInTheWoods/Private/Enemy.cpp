@@ -35,11 +35,87 @@ AEnemy::AEnemy()
 
 	pawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
 
-	if (pawnSensing)
+	if (pawnSensing) 
 	{
 		pawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::OnPawnSeen);
 		pawnSensing->SightRadius = 4000.f;
 		pawnSensing->SetPeripheralVisionAngle(75.f);
+	}
+}
+
+void AEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+
+	HandleHealthBarWidgetVisibility(false);
+	AIController = Cast<AAIController>(GetController());
+
+	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
+
+}
+
+void AEnemy::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (currentState > EEnemyState::EES_Patrolling)
+	{
+		CombatCheck();
+	}
+	else
+	{
+		PatrolCheck();
+	}
+
+}
+
+
+void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+}
+
+
+void AEnemy::ChangePatrolPoint()
+{
+	TArray<AActor*> nextPatrolPointsTargetList;
+	for (auto newPatrolPoint : patrolTargetPoints)
+	{
+		if (newPatrolPoint != patrolTarget) {
+
+			nextPatrolPointsTargetList.AddUnique(newPatrolPoint);
+		}
+	}
+
+	int patrolPointIndex = FMath::RandRange(0, nextPatrolPointsTargetList.Num() - 1);
+
+	patrolTarget = nextPatrolPointsTargetList[patrolPointIndex];
+
+
+}
+
+void AEnemy::CombatCheck()
+{
+	if (!IsInRange(combatTarget, chaseRadius))
+	{
+		combatTarget = nullptr;
+		HandleHealthBarWidgetVisibility(false);
+		currentState = EEnemyState::EES_Patrolling;
+		GetCharacterMovement()->MaxWalkSpeed = 150.f;
+		MoveToTarget(patrolTarget, patrolAcceptanceRadius);
+		UE_LOG(LogTemp, Warning, TEXT("lose interest"));
+	}
+	else if (!IsInRange(combatTarget, attackingRadius) && currentState!= EEnemyState::EES_Chasing)
+	{
+		StartChasing(combatTarget);
+		UE_LOG(LogTemp, Warning, TEXT("chasing from combat check"));
+		
+	}
+	else if (IsInRange(combatTarget, attackingRadius) && currentState != EEnemyState::EES_Attacking)
+	{
+		currentState = EEnemyState::EES_Attacking;
+		UE_LOG(LogTemp, Warning, TEXT("Attacking"));
 	}
 }
 
@@ -65,17 +141,109 @@ void AEnemy::GetHit_Implementation(const FVector& impactPoint)
 	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
 }
 
-// Called when the game starts or when spawned
-void AEnemy::BeginPlay()
+void AEnemy::HandleHealthBarWidgetVisibility(bool isVisible)
 {
-	Super::BeginPlay();
-
-	HandleHealthBarWidgetVisibility(false);
-	AIController = Cast<AAIController>(GetController());
-
-	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
-	
+	if (healthBarWidgetComponet)
+	{
+		healthBarWidgetComponet->SetVisibility(isVisible);
+	}
 }
+
+void AEnemy::HitDirection(const FVector& impactPoint)
+{
+	FVector forwardVector = GetActorForwardVector();
+	FVector toHit = (impactPoint - GetActorLocation()).GetSafeNormal();
+	FVector normalZToHit = FVector(toHit.X, toHit.Y, GetActorLocation().GetSafeNormal().Z);
+	double dotProduct = FVector::DotProduct(forwardVector, normalZToHit);
+	double cosTheta = FMath::Acos(dotProduct);
+	double degrees = FMath::RadiansToDegrees(cosTheta);
+
+
+	FVector crossProductVector = FVector::CrossProduct(forwardVector, normalZToHit);
+	if (crossProductVector.Z < 0) {
+		degrees *= -1.f;
+	}
+	GEngine->AddOnScreenDebugMessage(1, 5, FColor::Blue, FString::Printf(TEXT("Angle:%f"), degrees));
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + forwardVector * 60, 40.f, FLinearColor::Blue, 5.f);
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + normalZToHit * 60, 40.f, FLinearColor::Red, 5.f);
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + crossProductVector * 100.f, 40.f, FLinearColor::Black, 5.f);
+
+	FName hitReactionSectionName("FromBack");
+	if (degrees < 45 && degrees >= -45) {
+		hitReactionSectionName = FName("FromFront");
+	}
+	else if (degrees >= 45 && degrees < 135) {
+		hitReactionSectionName = FName("FromRight");
+	}
+	else if (degrees < -45 && degrees >= -135) {
+		hitReactionSectionName = FName("FromLeft");
+	}
+	PlayMontage(hitReactMontage, hitReactionSectionName);
+
+}
+
+bool AEnemy::IsInRange(AActor* target, double radius)
+{
+	if (!target)
+	{
+		return false;
+	}
+	double distance = (target->GetActorLocation() - GetActorLocation()).Size();
+	return distance < radius;
+}
+
+void AEnemy::MoveToTarget(AActor* targetActor, double acceptanceRadius)
+{
+	if (!AIController || !targetActor)
+	{
+		return;
+	}
+	FAIMoveRequest moveRequest;
+	moveRequest.SetGoalActor(targetActor);
+	moveRequest.SetAcceptanceRadius(acceptanceRadius);
+	AIController->MoveTo(moveRequest);
+}
+
+void AEnemy::OnPatrolTimerFinished()
+{
+	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
+}
+
+void AEnemy::OnPawnSeen(APawn* pawn)
+{
+	if(currentState == EEnemyState::EES_Chasing || currentState== EEnemyState::EES_Attacking)
+	{
+		return;
+	}
+	if (pawn->ActorHasTag(FName("Warrior")))
+	{
+
+		combatTarget = pawn;
+		StartChasing(combatTarget);
+		UE_LOG(LogTemp, Warning, TEXT("saw pawn"));	
+
+	}
+
+}
+
+void AEnemy::OnDeath()
+{
+	PlayDeathMontage();
+	HandleHealthBarWidgetVisibility(false);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+
+void AEnemy::PatrolCheck()
+{
+	if (IsInRange(patrolTarget, patrolRadius))
+	{
+		ChangePatrolPoint();
+		GetWorldTimerManager().SetTimer(patrolTimer, this, &AEnemy::OnPatrolTimerFinished, FMath::RandRange(1.f, 5.f));
+
+	}
+}
+
 
 void AEnemy::PlayHitReactMonatge()
 {
@@ -105,135 +273,17 @@ void AEnemy::PlayMontage(UAnimMontage* montage, FName sectionName)
 	}
 }
 
-void AEnemy::OnDeath()
+
+
+
+void AEnemy::StartChasing(AActor* targetActor)
 {
-	PlayDeathMontage();
-	HandleHealthBarWidgetVisibility(false);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-}
-
-void AEnemy::HandleHealthBarWidgetVisibility(bool isVisible)
-{
-	if (healthBarWidgetComponet)
-	{
-		healthBarWidgetComponet->SetVisibility(isVisible);
-	}
-}
-
-// Called every frame
-void AEnemy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (!IsInRange(combatTarget, CombatRadius))
-	{
-		 combatTarget = nullptr;			
-		 HandleHealthBarWidgetVisibility(false);
-	}
-	
-	if (IsInRange(patrolTarget, patrolRadius))
-	{
-		ChangePatrolPoint();
-		GetWorldTimerManager().SetTimer(patrolTimer, this, &AEnemy::OnPatrolTimerFinished, FMath::RandRange(1.f,5.f));
-		
-	}
-
-	
-		
-	
-	
-	
-
-}
-
-// Called to bind functionality to input
-void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
-void AEnemy::HitDirection(const FVector& impactPoint)
-{
-	FVector forwardVector = GetActorForwardVector();
-	FVector toHit = (impactPoint - GetActorLocation()).GetSafeNormal();
-	FVector normalZToHit = FVector(toHit.X, toHit.Y, GetActorLocation().GetSafeNormal().Z);
-	double dotProduct= FVector::DotProduct(forwardVector, normalZToHit);
-	double cosTheta = FMath::Acos(dotProduct);
-	double degrees = FMath::RadiansToDegrees(cosTheta);
-	
-
-	FVector crossProductVector= FVector::CrossProduct(forwardVector, normalZToHit);
-	if (crossProductVector.Z < 0) {
-		degrees *= -1.f;
-	}
-	GEngine->AddOnScreenDebugMessage(1, 5, FColor::Blue, FString::Printf(TEXT("Angle:%f"), degrees));
-	UKismetSystemLibrary::DrawDebugArrow(this,GetActorLocation(), GetActorLocation()+forwardVector*60,40.f,FLinearColor::Blue, 5.f);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + normalZToHit * 60, 40.f, FLinearColor::Red, 5.f);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(),  GetActorLocation()+crossProductVector*100.f, 40.f, FLinearColor::Black, 5.f);
-
-	FName hitReactionSectionName("FromBack");
-	if (degrees < 45 && degrees >= -45) {
-		hitReactionSectionName = FName("FromFront");
-	}
-	else if (degrees >= 45 && degrees < 135) {
-		hitReactionSectionName = FName("FromRight");
-	}
-	else if (degrees < -45 && degrees >= -135) {
-		hitReactionSectionName = FName("FromLeft");
-	}
-	PlayMontage(hitReactMontage, hitReactionSectionName);
-
-}
-
-bool AEnemy::IsInRange(AActor* target, double radius)
-{
-	if (!target)
-	{
-		return false;
-	}
-	double distance = (target->GetActorLocation() - GetActorLocation()).Size();
-	return distance<radius;
-}
-
-void AEnemy::ChangePatrolPoint()
-{
-	TArray<AActor*> nextPatrolPointsTargetList;
-	for (auto newPatrolPoint : patrolTargetPoints)
-	{
-		if (newPatrolPoint != patrolTarget) {
-
-			nextPatrolPointsTargetList.AddUnique(newPatrolPoint);
-		}
-	}
-
-	int patrolPointIndex = FMath::RandRange(0, nextPatrolPointsTargetList.Num() - 1);
-
-	patrolTarget = nextPatrolPointsTargetList[patrolPointIndex];	
-	
-	
-}
-
-void AEnemy::MoveToTarget(AActor* targetActor, double acceptanceRadius)
-{
-	if (!AIController ||!targetActor)
-	{
-		return;
-	}
-	FAIMoveRequest moveRequest;
-	moveRequest.SetGoalActor(targetActor);
-	moveRequest.SetAcceptanceRadius(acceptanceRadius);
-	AIController->MoveTo(moveRequest);
-}
-
-void AEnemy::OnPatrolTimerFinished()
-{
-	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
-}
-
-void AEnemy::OnPawnSeen(APawn* Pawn)
-{
-	UE_LOG(LogTemp, Warning, TEXT("saw pawn"));
+	currentState = EEnemyState::EES_Chasing;
+	combatTarget = targetActor;
+	GetWorldTimerManager().ClearTimer(patrolTimer);
+	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+	MoveToTarget(targetActor,combatAcceptanceRadius);
+	UE_LOG(LogTemp, Warning, TEXT("Chasing"));
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -242,9 +292,10 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 		healthComponent->ReceiveDamage(DamageAmount);
 		healthBarWidgetComponet->SetHealthBarPercent(healthComponent->GetHealthPercent());
-		combatTarget = EventInstigator->GetPawn();
+		
 	}
-	
+	combatTarget = EventInstigator->GetPawn();
+	StartChasing(combatTarget);
 	return DamageAmount;
 }
 
