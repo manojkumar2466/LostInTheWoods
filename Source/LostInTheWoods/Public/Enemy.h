@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "Interfaces/DamagableInterface.h"
 #include "EnumTypes.h"
+#include "Character/BaseCharacter.h"
 #include "Enemy.generated.h"
 
 UCLASS()
-class LOSTINTHEWOODS_API AEnemy : public ACharacter, public IDamagableInterface
+class LOSTINTHEWOODS_API AEnemy : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -38,8 +37,6 @@ public:
 private:
 	
 	
-	UPROPERTY(VisibleAnywhere)
-	class UHealthComponent* healthComponent;
 	 
 	UPROPERTY(EditAnywhere)
 	class UHealthBarWidgetComponent* healthBarWidgetComponet;
@@ -100,28 +97,15 @@ private:
 
 
 protected:
-
-	UPROPERTY(EditAnywhere, Category = Montage)
-	UAnimMontage* hitReactMontage;
-
-	UPROPERTY(EditAnywhere, Category = Montage)
-	UAnimMontage* deathMontage;
-
-	UPROPERTY(EditAnywhere, Category = SFX)
-	USoundBase* hitFleshSFX;
-	UPROPERTY(EditAnywhere, Category = VFX)
-
-	UParticleSystem* bloodVFX;
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EDeathStatus characterDeathStatus = EDeathStatus::EDS_Alive;
 
 	
 
-	void PlayHitReactMonatge();
-	void PlayDeathMontage();
-	void PlayMontage(UAnimMontage* montage, FName sectionName);
-	void OnDeath();
+	virtual void PlayDeathMontage() override;
+	virtual void OnDeath() override;
 	void HandleHealthBarWidgetVisibility(bool isVisible);
 
 

@@ -3,15 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "Interfaces/Pickup.h"
 #include "EnumTypes.h"
-#include "Interfaces/DamagableInterface.h"
+#include "Character/BaseCharacter.h"
 #include "Warrior.generated.h"
 
 
 UCLASS()
-class LOSTINTHEWOODS_API AWarrior : public ACharacter, public IPickup, public IDamagableInterface
+class LOSTINTHEWOODS_API AWarrior : public ABaseCharacter, public IPickup
 {
 	GENERATED_BODY()
 
@@ -41,8 +40,7 @@ protected:
 	class AItem* overlappingItem;
 
 	//Monatge section
-	UPROPERTY(EditAnywhere, Category = Combat)
-	UAnimMontage* swordAttackMontage;
+	
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* swordEquipMontage;
@@ -50,15 +48,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void Attack();
+	virtual void Attack() override;
 
 	//Montage section
-	void PlayAttackMontage();
+	virtual void PlayAttackMontage() override;
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerActionToUnoccupied();
 
-	UFUNCTION(BlueprintCallable)
-	void HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType);
+	
 
 
 private:
@@ -70,8 +67,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category= Component)
 	class UCameraComponent* camera;
 
-	UPROPERTY(VisibleAnywhere, Category = Combat)
-	class AWeapon* inHandWeapon;
 
 
 	UPROPERTY(VisibleAnywhere, Category = Combat)
@@ -94,11 +89,10 @@ private:
 	//input functions end
 
 	//AttackFunction
-	bool CanAttack();
+	virtual bool CanAttack() override;
 	bool CanDisarm();
 	bool CanEquipWeapon();
 	
-	void PlayMontage(UAnimMontage* montage, FName SectionName);
 	UFUNCTION(BlueprintCallable)
 	void EquipWeaponFromBack();
 	void AttachComponentToMesh(FName socketName);
