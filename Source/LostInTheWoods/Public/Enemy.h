@@ -62,6 +62,23 @@ private:
 	UPROPERTY(EditAnywhere)
 	double attackingRadius = 150.f;
 
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* shieldMesh;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* weaponMesh;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AWeapon> weaponClass;
+
+	UPROPERTY(EditAnywhere)
+	FName weaponSocketName;
+
+	UPROPERTY(EditAnywhere)
+	FName shieldSocketName;
+
+
+
 
 	UPROPERTY(EditAnywhere)
 	TArray<AActor*> patrolTargetPoints;

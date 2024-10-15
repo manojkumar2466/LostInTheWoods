@@ -31,7 +31,7 @@ void AWeapon::Equip(USceneComponent* parentMesh, FName socketName, AActor* newOw
 	SetInstigator(newInstigator);
 	weaponState = EWeaponState::EWS_Equiped;
 	FAttachmentTransformRules attachmentRules(EAttachmentRule::SnapToTarget, true);
-	mesh->AttachToComponent(parentMesh, attachmentRules, FName("WeaponSocketR"));
+	mesh->AttachToComponent(parentMesh, attachmentRules, socketName);
 	sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 

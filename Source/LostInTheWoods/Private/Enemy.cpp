@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
 #include "Perception/PawnSensingComponent.h"
+#include "Items/Weapon.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -41,6 +42,16 @@ AEnemy::AEnemy()
 		pawnSensing->SightRadius = 4000.f;
 		pawnSensing->SetPeripheralVisionAngle(75.f);
 	}
+	shieldMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Shield"));
+	shieldMesh->SetupAttachment(GetRootComponent());
+	shieldMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	shieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	/*weaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon"));
+	weaponMesh->SetupAttachment(GetRootComponent());
+	weaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	weaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
+
 }
 
 void AEnemy::BeginPlay()
@@ -52,6 +63,19 @@ void AEnemy::BeginPlay()
 
 	patrolTarget = patrolTargetPoints[FMath::RandRange(0, patrolTargetPoints.Num() - 1)];
 	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
+
+	
+	FAttachmentTransformRules transformrules(EAttachmentRule::SnapToTarget, true);
+	shieldMesh->AttachToComponent(GetMesh(), transformrules, shieldSocketName);
+
+	//weaponMesh->AttachToComponent(GetMesh(), transformrules, FName("InHandWeaponSocket"));
+
+	if (weaponClass)
+	{
+		inHandWeapon = GetWorld()->SpawnActor<AWeapon>(weaponClass);
+		inHandWeapon->Equip(GetMesh(), weaponSocketName, this, this);
+
+	}
 
 }
 
