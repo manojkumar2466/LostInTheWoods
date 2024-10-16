@@ -42,18 +42,7 @@ void AWarrior::Attack()
 	}
 }
 
-void AWarrior::PlayAttackMontage()
-{
-	Super::PlayAttackMontage();
-	int32 randomIndex = FMath::RandRange(0, 1);
 
-	TArray<FName> sections;
-	sections.Add("Attack1");
-	sections.Add("Attack2");
-	PlayMontage(swordAttackMontage, sections[randomIndex]);
-
-	
-}
 
 void AWarrior::SetPlayerActionToUnoccupied()
 {

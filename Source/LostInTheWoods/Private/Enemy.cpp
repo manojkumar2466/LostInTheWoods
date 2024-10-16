@@ -138,8 +138,8 @@ void AEnemy::CombatCheck()
 		
 	}
 	else if (IsInRange(combatTarget, attackingRadius) && currentState != EEnemyState::EES_Attacking)
-	{
-		currentState = EEnemyState::EES_Attacking;
+	{		
+		Attack();
 		UE_LOG(LogTemp, Warning, TEXT("Attacking"));
 	}
 }
@@ -270,7 +270,14 @@ void AEnemy::PatrolCheck()
 	}
 }
 
+//Protected Functions
+void AEnemy::Attack()
+{
+	Super::Attack();
+	currentState = EEnemyState::EES_Attacking;
+	PlayAttackMontage();
 
+}
 
 void AEnemy::PlayDeathMontage()
 {

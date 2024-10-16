@@ -90,8 +90,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UPawnSensingComponent* pawnSensing;
 
-	UPROPERTY(VisibleAnywhere)
-	EEnemyState currentState = EEnemyState::EES_Patrolling;
+	
 
 	void HitDirection(const FVector& hitResult);
 
@@ -112,14 +111,19 @@ private:
 
 	void PatrolCheck();
 
+	
+
 
 protected:
 	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EDeathStatus characterDeathStatus = EDeathStatus::EDS_Alive;
+	EDeathStatus characterDeathStatus = EDeathStatus::EDS_DeathPose1;
 
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EEnemyState currentState = EEnemyState::EES_Patrolling;
+
+	virtual void Attack() override;
 
 	virtual void PlayDeathMontage() override;
 	virtual void OnDeath() override;
