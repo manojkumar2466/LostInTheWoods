@@ -39,7 +39,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ABaseCharacter::Attack()
 {
-
+	
 	
 }
 
@@ -71,7 +71,8 @@ void ABaseCharacter::OnDeath()
 
 void ABaseCharacter::PlayAttackMontage()
 {
-
+	int sectionSelectionIndex = FMath::RandRange(0, attackMontageSectionNames.Num() - 1);
+	PlayMontage(attackMontage, attackMontageSectionNames[sectionSelectionIndex]);
 }
 
 void ABaseCharacter::PlayDeathMontage()

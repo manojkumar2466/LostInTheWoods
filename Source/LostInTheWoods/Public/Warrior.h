@@ -50,8 +50,6 @@ protected:
 
 	virtual void Attack() override;
 
-	//Montage section
-	virtual void PlayAttackMontage() override;
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerActionToUnoccupied();
 

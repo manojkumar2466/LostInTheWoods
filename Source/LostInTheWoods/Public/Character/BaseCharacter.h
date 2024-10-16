@@ -29,6 +29,9 @@ private:
 	
 protected:
 
+	UPROPERTY(EditAnywhere, Category= MontageSection)
+	TArray<FName> attackMontageSectionNames;
+
 	UPROPERTY(EditAnywhere, Category = VFX)
 	UParticleSystem* bloodVFX;
 
@@ -48,7 +51,7 @@ protected:
 	class UHealthComponent* healthComponent;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	UAnimMontage* swordAttackMontage;
+	UAnimMontage* attackMontage;
 
 	virtual void Attack();
 
