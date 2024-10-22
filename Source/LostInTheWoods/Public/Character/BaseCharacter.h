@@ -69,6 +69,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType);
 
+	void HitDirection( const FVector& impactPoint);
+
 	bool IsAlive();
 	virtual void OnDeath();
 
