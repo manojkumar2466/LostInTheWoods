@@ -38,6 +38,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Montage)
 	UAnimMontage* deathMontage;
 
+	UPROPERTY(EditAnywhere)
+	TArray<FName> deathMontageSectionNames;
+
+	int deathPoseIndex;
+
 	UPROPERTY(EditAnywhere, Category = SFX)
 	USoundBase* hitFleshSFX;
 
@@ -55,17 +60,26 @@ protected:
 
 	virtual void Attack();
 
-	virtual bool CanAttack();	
+	UFUNCTION(BlueprintCallable)
+	virtual void AttackEnd();
+
+	void DisableCapusleCollider();
+
 
 	UFUNCTION(BlueprintCallable)
 	void HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType);
 
+	bool IsAlive();
 	virtual void OnDeath();
 
 	virtual void PlayAttackMontage();
 
+	void PlayBloodVFX(const FVector& impactPoint);
 	virtual void PlayDeathMontage();
 	virtual void PlayHitReactMonatge(FName sectionName);
+
+	void PlayHitSound( const FVector &impactPoint);
+
 
 	virtual void PlayMontage(UAnimMontage* montage, FName sectionName);
 };

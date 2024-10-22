@@ -27,15 +27,15 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	virtual void OnSphereOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-
-	virtual void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
-
+	
 	UFUNCTION()
 	void OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 private:
 
 	//box trace
+
+	UPROPERTY(EditAnywhere)
+	FVector boxTraceExtends= FVector(5.f);
 	UPROPERTY(VisibleAnywhere)
 	class UBoxComponent* boxCollider;
 
@@ -47,4 +47,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float damage = 20.f;
+
+	void StartBoxTrace(FHitResult& hitResult);
 };

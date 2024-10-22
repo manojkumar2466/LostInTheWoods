@@ -7,6 +7,7 @@
 #include "Items/Item.h"
 #include "Items/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AWarrior::AWarrior()
@@ -18,6 +19,13 @@ AWarrior::AWarrior()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+
+	GetMesh()->SetGenerateOverlapEvents(true);	
 	springArm = CreateDefaultSubobject<USpringArmComponent>("CameraSpringArm");
 	springArm->SetupAttachment(GetRootComponent());
 	camera = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
@@ -59,6 +67,8 @@ void AWarrior::Tick(float DeltaTime)
 void AWarrior::GetHit_Implementation(const FVector& impactPoint)
 {
 	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
+	PlayHitSound(impactPoint);
+	PlayBloodVFX(impactPoint);
 }
 
 // Called to bind functionality to input
@@ -109,10 +119,9 @@ void AWarrior::LookUp(float value)
 {
 	AddControllerPitchInput(value);
 }
-
+	
 bool AWarrior::CanAttack()
 {
-	Super::CanAttack();
 	return actionState == ECharacterActionState::ECAS_Unoccupied && characterWeaponState == ECharacterWeaponEquipState::ECWES_Equipped;
 }
 

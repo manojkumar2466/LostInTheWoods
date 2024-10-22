@@ -87,9 +87,10 @@ private:
 	//input functions end
 
 	//AttackFunction
-	virtual bool CanAttack() override;
+	virtual bool CanAttack();
 	bool CanDisarm();
 	bool CanEquipWeapon();
+	
 	
 	UFUNCTION(BlueprintCallable)
 	void EquipWeaponFromBack();
