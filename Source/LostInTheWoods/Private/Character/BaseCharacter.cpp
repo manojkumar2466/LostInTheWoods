@@ -73,6 +73,39 @@ void ABaseCharacter::HandleWeaponBoxCollision(ECollisionEnabled::Type collisionT
 	
 }
 
+void ABaseCharacter::HitDirection( const FVector& impactPoint)
+{
+
+	FVector forwardVector = GetActorForwardVector();
+	FVector toHit = (impactPoint - GetActorLocation()).GetSafeNormal();
+	FVector normalZToHit = FVector(toHit.X, toHit.Y, GetActorLocation().GetSafeNormal().Z);
+	double dotProduct = FVector::DotProduct(forwardVector, normalZToHit);
+	double cosTheta = FMath::Acos(dotProduct);
+	double degrees = FMath::RadiansToDegrees(cosTheta);
+
+
+	FVector crossProductVector = FVector::CrossProduct(forwardVector, normalZToHit);
+	if (crossProductVector.Z < 0) {
+		degrees *= -1.f;
+	}
+	GEngine->AddOnScreenDebugMessage(1, 5, FColor::Blue, FString::Printf(TEXT("Angle:%f"), degrees));
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + forwardVector * 60, 40.f, FLinearColor::Blue, 5.f);
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + normalZToHit * 60, 40.f, FLinearColor::Red, 5.f);
+	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + crossProductVector * 100.f, 40.f, FLinearColor::Black, 5.f);
+
+	FName hitReactionSectionName("FromBack");
+	if (degrees < 45 && degrees >= -45) {
+		hitReactionSectionName = FName("FromFront");
+	}
+	else if (degrees >= 45 && degrees < 135) {
+		hitReactionSectionName = FName("FromRight");
+	}
+	else if (degrees < -45 && degrees >= -135) {
+		hitReactionSectionName = FName("FromLeft");
+	}
+	PlayHitReactMonatge(hitReactionSectionName);
+}
+
 bool ABaseCharacter::IsAlive()
 {
 	return healthComponent && healthComponent->IsAlive();

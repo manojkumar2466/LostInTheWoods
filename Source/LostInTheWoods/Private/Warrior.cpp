@@ -67,6 +67,7 @@ void AWarrior::Tick(float DeltaTime)
 void AWarrior::GetHit_Implementation(const FVector& impactPoint)
 {
 	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
+	HitDirection(impactPoint);
 	PlayHitSound(impactPoint);
 	PlayBloodVFX(impactPoint);
 }
