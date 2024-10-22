@@ -27,10 +27,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
 	
 
 
@@ -48,10 +44,16 @@ private:
 	double chaseRadius = 1000.f;
 
 	UPROPERTY(EditAnywhere)
+	double chaseWalkSpeed = 400.f;
+
+	UPROPERTY(EditAnywhere)
 	AActor* patrolTarget;
 
 	UPROPERTY(EditAnywhere)
 	double patrolRadius = 100.f;
+
+	UPROPERTY(EditAnywhere)
+	double patrolWalkSpeed = 150.f;
 
 	UPROPERTY(EditAnywhere)
 	double patrolAcceptanceRadius = 100.f;
@@ -90,11 +92,14 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UPawnSensingComponent* pawnSensing;
 
-	
+	bool CanAttack();
+	void ClearTimer(FTimerHandle timer);
 
 	void HitDirection(const FVector& hitResult);
 
 	bool IsInRange(AActor* target, double radius);
+	bool IsEngaged();
+	bool IsDead();
 
 	void ChangePatrolPoint();
 
@@ -113,22 +118,41 @@ private:
 
 	
 
+	
+
 
 protected:
 	
+	UPROPERTY(EditAnywhere)
+	float attackMinTime;
+
+	UPROPERTY(EditAnywhere)
+	float attackMaxTime;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EDeathStatus characterDeathStatus = EDeathStatus::EDS_DeathPose1;
+	EEnemyDeathPose enemyDeathPose = EEnemyDeathPose::EDS_DeathPose1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEnemyState currentState = EEnemyState::EES_Patrolling;
 
+	FTimerHandle attackTimer;
+
+	
 	virtual void Attack() override;
 
-	virtual void PlayDeathMontage() override;
+	
+	virtual void AttackEnd() override;
+
+	void LoseInterestChasingPlayer();
+
 	virtual void OnDeath() override;
 	void HandleHealthBarWidgetVisibility(bool isVisible);
 
+
+	void StartAttackTimer();
+	void StartPatroling();
+
+	
 
 
 

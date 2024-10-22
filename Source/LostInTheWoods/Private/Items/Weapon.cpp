@@ -2,7 +2,6 @@
 
 
 #include "Items/Weapon.h"
-#include "Warrior.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -41,33 +40,44 @@ void AWeapon::BeginPlay()
 	boxCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnBoxOverlapStart);
 }
 
-void AWeapon::OnSphereOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	Super::OnSphereOverlapStart(OverlappedComponent,OtherActor,OtherComp,OtherBodyIndex,bFromSweep, SweepResult);
-	
-	AWarrior* warrior = Cast<AWarrior>(OtherActor);
-	if (warrior) {
-		warrior->SetOverlapingItem(this);
-		
-	}
-	UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnSphereOverlapStart"));
-}
 
-void AWeapon::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	Super::OnSphereOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
-	AWarrior* warrior = Cast<AWarrior>(OtherActor);
-	if (warrior) {
-		warrior->SetOverlapingItem(nullptr);
-
-	}
-}
 
 void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+
+	if (GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->GetOwner()->ActorHasTag(TEXT("Enemy")))
+	{
+		return;
+	}
+	FHitResult hitResult;
+	StartBoxTrace(hitResult);
+	if (hitResult.GetActor())
+	{
+		if (GetOwner()->ActorHasTag(TEXT("Enemy")) && hitResult.GetActor()->ActorHasTag(TEXT("Enemy")))
+		{
+			return;
+		}
+		IDamagableInterface* hitActor = Cast<IDamagableInterface>(hitResult.GetActor());
+		if (hitActor) {
+			UGameplayStatics::ApplyDamage(
+				hitResult.GetActor(),
+				damage, GetInstigator()->GetController(),
+				this,
+				UDamageType::StaticClass());
+			hitActor->Execute_GetHit(hitResult.GetActor(), hitResult.ImpactPoint);
+
+		}
+		ignoreActors.AddUnique(hitResult.GetActor());
+	}
+	
+
+}
+
+void AWeapon::StartBoxTrace(FHitResult& hitResult)
+{
 	const FVector start = startTrace->GetComponentLocation();
 	const FVector end = endTrace->GetComponentLocation();
-	FHitResult hitResult;
+
 	TArray<AActor*> ignoreActorList;
 	ignoreActorList.Add(this);
 	for (AActor* Actor : ignoreActors) {
@@ -78,7 +88,7 @@ void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor
 		this,
 		start,
 		end,
-		FVector(5.f, 5.f, 5.f),
+		boxTraceExtends,
 		startTrace->GetComponentRotation(),
 		ETraceTypeQuery::TraceTypeQuery1,
 		false,
@@ -86,21 +96,6 @@ void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor
 		EDrawDebugTrace::ForDuration,
 		hitResult,
 		true
-		);
-
-	if (hitResult.GetActor())
-	{
-		IDamagableInterface* hitActor = Cast<IDamagableInterface>(hitResult.GetActor());
-		if (hitActor) {
-			UGameplayStatics::ApplyDamage(
-				hitResult.GetActor(),
-				damage, GetInstigator()->GetController(),
-				this,
-				UDamageType::StaticClass());
-			hitActor->Execute_GetHit(hitResult.GetActor(),hitResult.ImpactPoint);
-			
-		}		
-		ignoreActors.AddUnique(hitResult.GetActor());
-	}
+	);
 
 }

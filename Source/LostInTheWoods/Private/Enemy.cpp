@@ -4,7 +4,6 @@
 #include "Enemy.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/GameplayStatics.h"
 #include "Components/HealthComponent.h"
 #include "HUD/HealthBarWidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -46,6 +45,7 @@ AEnemy::AEnemy()
 	shieldMesh->SetupAttachment(GetRootComponent());
 	shieldMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	shieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Tags.Add("Enemy");
 
 	/*weaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon"));
 	weaponMesh->SetupAttachment(GetRootComponent());
@@ -62,7 +62,7 @@ void AEnemy::BeginPlay()
 	AIController = Cast<AAIController>(GetController());
 
 	patrolTarget = patrolTargetPoints[FMath::RandRange(0, patrolTargetPoints.Num() - 1)];
-	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
+	StartPatroling();
 
 	
 	FAttachmentTransformRules transformrules(EAttachmentRule::SnapToTarget, true);
@@ -83,6 +83,11 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsDead())
+	{
+		return;
+	}
+
 	if (currentState > EEnemyState::EES_Patrolling)
 	{
 		CombatCheck();
@@ -91,13 +96,6 @@ void AEnemy::Tick(float DeltaTime)
 	{
 		PatrolCheck();
 	}
-
-}
-
-
-void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
@@ -124,29 +122,38 @@ void AEnemy::CombatCheck()
 {
 	if (!IsInRange(combatTarget, chaseRadius))
 	{
-		combatTarget = nullptr;
-		HandleHealthBarWidgetVisibility(false);
-		currentState = EEnemyState::EES_Patrolling;
-		GetCharacterMovement()->MaxWalkSpeed = 150.f;
-		MoveToTarget(patrolTarget, patrolAcceptanceRadius);
-		UE_LOG(LogTemp, Warning, TEXT("lose interest"));
+		ClearTimer(attackTimer);
+		LoseInterestChasingPlayer();
+		if (!IsEngaged())
+		{
+			StartPatroling();
+		}
+		
 	}
 	else if (!IsInRange(combatTarget, attackingRadius) && currentState!= EEnemyState::EES_Chasing)
 	{
-		StartChasing(combatTarget);
+		ClearTimer(patrolTimer);
+		ClearTimer(attackTimer);
+		if (!IsEngaged())
+		{
+			StartChasing(combatTarget);
+		}
+		
 		UE_LOG(LogTemp, Warning, TEXT("chasing from combat check"));
 		
 	}
-	else if (IsInRange(combatTarget, attackingRadius) && currentState != EEnemyState::EES_Attacking)
+	else if (CanAttack())
 	{		
-		Attack();
+		ClearTimer(attackTimer);
+		ClearTimer(patrolTimer);
+		StartAttackTimer();
 		UE_LOG(LogTemp, Warning, TEXT("Attacking"));
 	}
 }
 
 void AEnemy::GetHit_Implementation(const FVector& impactPoint)
 {
-	if (healthComponent && healthComponent->IsAlive())
+	if (IsAlive())
 	{
 		HandleHealthBarWidgetVisibility(true);
 		HitDirection(impactPoint);
@@ -157,11 +164,8 @@ void AEnemy::GetHit_Implementation(const FVector& impactPoint)
 		OnDeath();
 	}
 	
-	if (hitFleshSFX)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, hitFleshSFX, impactPoint);
-	}
-	if (bloodVFX) UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bloodVFX, impactPoint);
+	PlayHitSound(impactPoint);
+	PlayBloodVFX(impactPoint);
 	
 	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
 }
@@ -172,6 +176,29 @@ void AEnemy::HandleHealthBarWidgetVisibility(bool isVisible)
 	{
 		healthBarWidgetComponet->SetVisibility(isVisible);
 	}
+}
+
+void AEnemy::StartAttackTimer()
+{
+	currentState = EEnemyState::EES_Attacking;
+	GetWorldTimerManager().SetTimer(attackTimer,this,&AEnemy::Attack,FMath::RandRange(attackMinTime,attackMaxTime));
+}
+
+void AEnemy::StartPatroling()
+{
+	currentState = EEnemyState::EES_Patrolling;
+	GetCharacterMovement()->MaxWalkSpeed = patrolWalkSpeed;
+	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
+}
+
+bool AEnemy::CanAttack()
+{
+	return IsInRange(combatTarget, attackingRadius) && currentState != EEnemyState::EES_Attacking && currentState!=EEnemyState::EES_Dead && currentState!= EEnemyState::EES_Engaged;
+}
+
+void AEnemy::ClearTimer(FTimerHandle timer)
+{
+	GetWorldTimerManager().ClearTimer(timer);
 }
 
 void AEnemy::HitDirection(const FVector& impactPoint)
@@ -217,6 +244,16 @@ bool AEnemy::IsInRange(AActor* target, double radius)
 	return distance < radius;
 }
 
+bool AEnemy::IsEngaged()
+{
+	return currentState== EEnemyState::EES_Engaged;
+}
+
+bool AEnemy::IsDead()
+{
+	return currentState==EEnemyState::EES_Dead;
+}
+
 void AEnemy::MoveToTarget(AActor* targetActor, double acceptanceRadius)
 {
 	if (!AIController || !targetActor)
@@ -236,27 +273,30 @@ void AEnemy::OnPatrolTimerFinished()
 
 void AEnemy::OnPawnSeen(APawn* pawn)
 {
-	if(currentState == EEnemyState::EES_Chasing || currentState== EEnemyState::EES_Attacking)
-	{
-		return;
-	}
-	if (pawn->ActorHasTag(FName("Warrior")))
-	{
+	bool canChase = currentState== EEnemyState::EES_Patrolling
+		&& pawn->ActorHasTag(FName("Warrior"));
 
+	if(canChase)
+	{
 		combatTarget = pawn;
+		ClearTimer(patrolTimer);
 		StartChasing(combatTarget);
-		UE_LOG(LogTemp, Warning, TEXT("saw pawn"));	
-
+		UE_LOG(LogTemp, Warning, TEXT("saw pawn"));
 	}
+	
 
 }
 
 void AEnemy::OnDeath()
 {
 	Super::OnDeath();
-	PlayDeathMontage();
+	currentState = EEnemyState::EES_Dead;
+	TEnumAsByte<EEnemyDeathPose> deathPose(deathPoseIndex);
+	enemyDeathPose = deathPose;
 	HandleHealthBarWidgetVisibility(false);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	DisableCapusleCollider();
+	ClearTimer(attackTimer);
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 
@@ -274,28 +314,23 @@ void AEnemy::PatrolCheck()
 void AEnemy::Attack()
 {
 	Super::Attack();
-	currentState = EEnemyState::EES_Attacking;
+	currentState = EEnemyState::EES_Engaged;
 	PlayAttackMontage();
 
 }
 
-void AEnemy::PlayDeathMontage()
+void AEnemy::AttackEnd()
 {
-	Super::SetPlayerDefaults();
-	TArray<FName> sections;
-	sections.Add("Death1");
-	sections.Add("Death2");
-	sections.Add("Death3");
-	
-	int sectionIndex = FMath::FRandRange(0, 2);
-
-	//TEnumAsByte<EDeathStatus> Pose(sectionIndex+1);
-	characterDeathStatus = StaticCast<EDeathStatus>(sectionIndex + 1);
-	PlayMontage(deathMontage, sections[sectionIndex]);
+	Super::AttackEnd();
+	currentState = EEnemyState::EES_NoState;
 }
 
-
-
+void AEnemy::LoseInterestChasingPlayer()
+{
+	combatTarget = nullptr;
+	HandleHealthBarWidgetVisibility(false);
+	UE_LOG(LogTemp, Warning, TEXT("lose interest"));
+}
 
 
 
@@ -303,7 +338,6 @@ void AEnemy::StartChasing(AActor* targetActor)
 {
 	currentState = EEnemyState::EES_Chasing;
 	combatTarget = targetActor;
-	GetWorldTimerManager().ClearTimer(patrolTimer);
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	MoveToTarget(targetActor,combatAcceptanceRadius);
 	UE_LOG(LogTemp, Warning, TEXT("Chasing"));
@@ -318,6 +352,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		
 	}
 	combatTarget = EventInstigator->GetPawn();
+	ClearTimer(patrolTimer);
 	StartChasing(combatTarget);
 	return DamageAmount;
 }

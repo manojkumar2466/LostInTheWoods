@@ -5,6 +5,9 @@
 #include "Items/Weapon.h"
 #include "Components/BoxComponent.h"
 #include "Components/HealthComponent.h"
+#include "Kismet/GameplayStatics.h"
+
+#include "Components/CapsuleComponent.h"
 
 
 // Sets default values
@@ -43,10 +46,16 @@ void ABaseCharacter::Attack()
 	
 }
 
-bool ABaseCharacter::CanAttack()
+void ABaseCharacter::AttackEnd()
 {
-	return false;
+
 }
+
+void ABaseCharacter::DisableCapusleCollider()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 
 
 
@@ -64,8 +73,14 @@ void ABaseCharacter::HandleWeaponBoxCollision(ECollisionEnabled::Type collisionT
 	
 }
 
+bool ABaseCharacter::IsAlive()
+{
+	return healthComponent && healthComponent->IsAlive();
+}
+
 void ABaseCharacter::OnDeath()
 {
+	
 	PlayDeathMontage();
 }
 
@@ -75,14 +90,32 @@ void ABaseCharacter::PlayAttackMontage()
 	PlayMontage(attackMontage, attackMontageSectionNames[sectionSelectionIndex]);
 }
 
+void ABaseCharacter::PlayBloodVFX(const FVector& impactPoint)
+{
+	if (bloodVFX)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bloodVFX, impactPoint);
+	}
+}
+
 void ABaseCharacter::PlayDeathMontage()
 {
-
+	int sectionNameIndex = FMath::RandRange(0, deathMontageSectionNames.Num() - 1);
+	deathPoseIndex = sectionNameIndex;
+	PlayMontage(deathMontage, deathMontageSectionNames[sectionNameIndex]);
 }
 
 void ABaseCharacter::PlayHitReactMonatge(FName sectionName)
 {
 	PlayMontage(hitReactMontage, sectionName);
+}
+
+void ABaseCharacter::PlayHitSound(const FVector& impactPoint)
+{
+	if (hitFleshSFX)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, hitFleshSFX, impactPoint);
+	}
 }
 
 void ABaseCharacter::PlayMontage(UAnimMontage* montage, FName sectionName)
