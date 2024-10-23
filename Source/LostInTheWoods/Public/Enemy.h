@@ -95,7 +95,6 @@ private:
 	bool CanAttack();
 	void ClearTimer(FTimerHandle timer);
 
-	void HitDirection(const FVector& hitResult);
 
 	bool IsInRange(AActor* target, double radius);
 	bool IsEngaged();
@@ -157,7 +156,7 @@ protected:
 
 
 public:
-	virtual void GetHit_Implementation(const FVector& impactPoint) override;
+	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 };

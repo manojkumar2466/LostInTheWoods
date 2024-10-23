@@ -56,6 +56,16 @@ void ABaseCharacter::DisableCapusleCollider()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ABaseCharacter::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
+{
+	
+
+	PlayHitSound(impactPoint);
+	PlayBloodVFX(impactPoint);
+
+	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
+}
+
 
 
 

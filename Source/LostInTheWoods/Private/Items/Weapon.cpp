@@ -45,10 +45,7 @@ void AWeapon::BeginPlay()
 void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
-	if (GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->GetOwner()->ActorHasTag(TEXT("Enemy")))
-	{
-		return;
-	}
+	
 	FHitResult hitResult;
 	StartBoxTrace(hitResult);
 	if (hitResult.GetActor())
@@ -64,7 +61,7 @@ void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor
 				damage, GetInstigator()->GetController(),
 				this,
 				UDamageType::StaticClass());
-			hitActor->Execute_GetHit(hitResult.GetActor(), hitResult.ImpactPoint);
+			hitActor->Execute_GetHit(hitResult.GetActor(), hitResult.ImpactPoint, GetOwner());
 
 		}
 		ignoreActors.AddUnique(hitResult.GetActor());

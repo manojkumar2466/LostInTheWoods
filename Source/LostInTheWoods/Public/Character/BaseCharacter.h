@@ -65,6 +65,7 @@ protected:
 
 	void DisableCapusleCollider();
 
+	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor);
 
 	UFUNCTION(BlueprintCallable)
 	void HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType);
