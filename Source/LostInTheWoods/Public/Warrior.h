@@ -31,7 +31,7 @@ public:
 
 
 	//HitInterface
-	virtual void GetHit_Implementation(const FVector& impactPoint) override;
+	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -94,6 +94,9 @@ private:
 	
 	UFUNCTION(BlueprintCallable)
 	void EquipWeaponFromBack();
+
+	UFUNCTION(BlueprintCallable)
+	void HitReactEnd();
 	void AttachComponentToMesh(FName socketName);
 	UFUNCTION(BlueprintCallable)
 	void Disarm();

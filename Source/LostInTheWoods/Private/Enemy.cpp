@@ -151,23 +151,24 @@ void AEnemy::CombatCheck()
 	}
 }
 
-void AEnemy::GetHit_Implementation(const FVector& impactPoint)
+void AEnemy::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
 {
+	Super::GetHit_Implementation(impactPoint, hittingActor);
 	if (IsAlive())
 	{
+		HitDirection(hittingActor->GetActorLocation());		
+		
 		HandleHealthBarWidgetVisibility(true);
-		HitDirection(impactPoint);
 	}
 	else
 	{
-		
+
 		OnDeath();
 	}
 	
-	PlayHitSound(impactPoint);
-	PlayBloodVFX(impactPoint);
-	
-	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
+	ClearTimer(patrolTimer);
+	ClearTimer(attackTimer); 
+	StopMontage(attackMontage);
 }
 
 void AEnemy::HandleHealthBarWidgetVisibility(bool isVisible)
@@ -262,6 +263,7 @@ void AEnemy::OnDeath()
 	currentState = EEnemyState::EES_Dead;
 	TEnumAsByte<EEnemyDeathPose> deathPose(deathPoseIndex);
 	enemyDeathPose = deathPose;
+	HandleWeaponBoxCollision(ECollisionEnabled::NoCollision);
 	HandleHealthBarWidgetVisibility(false);
 	DisableCapusleCollider();
 	ClearTimer(attackTimer);
@@ -321,8 +323,16 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		
 	}
 	combatTarget = EventInstigator->GetPawn();
-	ClearTimer(patrolTimer);
-	StartChasing(combatTarget);
+	
+	if (IsInRange(combatTarget, attackingRadius))
+	{
+		currentState = EEnemyState::EES_Attacking;
+	}
+	else if( !IsInRange(combatTarget, attackingRadius))
+	{
+		StartChasing(combatTarget);
+	}
+	
 	return DamageAmount;
 }
 

@@ -64,12 +64,15 @@ void AWarrior::Tick(float DeltaTime)
 
 }
 
-void AWarrior::GetHit_Implementation(const FVector& impactPoint)
+void AWarrior::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
 {
-	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
-	HitDirection(impactPoint);
-	PlayHitSound(impactPoint);
-	PlayBloodVFX(impactPoint);
+	Super::GetHit_Implementation(impactPoint,  hittingActor);
+	HandleWeaponBoxCollision(ECollisionEnabled::NoCollision);
+	HitDirection(hittingActor->GetActorLocation());
+	actionState = ECharacterActionState::ECAS_HitReact;
+	
+
+	
 }
 
 // Called to bind functionality to input
@@ -174,6 +177,11 @@ void AWarrior::EquipWeaponFromBack()
 void AWarrior::Disarm()
 {
 	AttachComponentToMesh(FName("WeaponSocket"));
+}
+
+void AWarrior::HitReactEnd()
+{
+	actionState = ECharacterActionState::ECAS_Unoccupied;
 }
 
 void AWarrior::AttachComponentToMesh(FName socketName)

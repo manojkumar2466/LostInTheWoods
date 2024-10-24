@@ -56,6 +56,16 @@ void ABaseCharacter::DisableCapusleCollider()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ABaseCharacter::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
+{
+	
+
+	PlayHitSound(impactPoint);
+	PlayBloodVFX(impactPoint);
+
+	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
+}
+
 
 
 
@@ -157,6 +167,15 @@ void ABaseCharacter::PlayMontage(UAnimMontage* montage, FName sectionName)
 	if (animInstance) {
 		animInstance->Montage_Play(montage);
 		animInstance->Montage_JumpToSection(sectionName, montage);
+	}
+}
+
+void ABaseCharacter::StopMontage(UAnimMontage* montage)
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance)
+	{
+		animInstance->Montage_Stop(0.25f,montage);
 	}
 }
 
