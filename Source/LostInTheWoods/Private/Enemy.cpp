@@ -167,6 +167,8 @@ void AEnemy::GetHit_Implementation(const FVector& impactPoint, AActor* hittingAc
 	}
 	
 	ClearTimer(patrolTimer);
+	ClearTimer(attackTimer); 
+	StopMontage(attackMontage);
 }
 
 void AEnemy::HandleHealthBarWidgetVisibility(bool isVisible)
@@ -322,7 +324,15 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	}
 	combatTarget = EventInstigator->GetPawn();
 	
-	StartChasing(combatTarget);
+	if (IsInRange(combatTarget, attackingRadius))
+	{
+		currentState = EEnemyState::EES_Attacking;
+	}
+	else if( !IsInRange(combatTarget, attackingRadius))
+	{
+		StartChasing(combatTarget);
+	}
+	
 	return DamageAmount;
 }
 

@@ -170,6 +170,15 @@ void ABaseCharacter::PlayMontage(UAnimMontage* montage, FName sectionName)
 	}
 }
 
+void ABaseCharacter::StopMontage(UAnimMontage* montage)
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance)
+	{
+		animInstance->Montage_Stop(0.25f,montage);
+	}
+}
+
 
 
 

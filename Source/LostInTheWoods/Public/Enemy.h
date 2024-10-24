@@ -37,8 +37,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UHealthBarWidgetComponent* healthBarWidgetComponet;
 
-	UPROPERTY(VisibleAnywhere)
-	AActor* combatTarget;
+	
 
 	UPROPERTY(EditAnywhere)
 	double chaseRadius = 1000.f;
@@ -129,6 +128,9 @@ protected:
 	float attackMaxTime;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AActor* combatTarget;	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEnemyDeathPose enemyDeathPose = EEnemyDeathPose::EDS_DeathPose1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -156,6 +158,7 @@ protected:
 
 
 public:
+	
 	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 

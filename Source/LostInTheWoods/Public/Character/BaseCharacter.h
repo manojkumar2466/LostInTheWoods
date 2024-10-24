@@ -85,4 +85,6 @@ protected:
 
 
 	virtual void PlayMontage(UAnimMontage* montage, FName sectionName);
+
+	void StopMontage(UAnimMontage* montage);
 };
