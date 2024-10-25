@@ -33,6 +33,8 @@ public:
 	//HitInterface
 	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor) override;
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 protected:

@@ -75,6 +75,11 @@ void AWarrior::GetHit_Implementation(const FVector& impactPoint, AActor* hitting
 	
 }
 
+float AWarrior::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	return DamageAmount;
+}
+
 // Called to bind functionality to input
 void AWarrior::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
