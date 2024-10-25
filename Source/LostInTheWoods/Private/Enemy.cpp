@@ -156,16 +156,9 @@ void AEnemy::GetHit_Implementation(const FVector& impactPoint, AActor* hittingAc
 	Super::GetHit_Implementation(impactPoint, hittingActor);
 	if (IsAlive())
 	{
-		HitDirection(hittingActor->GetActorLocation());		
-		
+
 		HandleHealthBarWidgetVisibility(true);
 	}
-	else
-	{
-
-		OnDeath();
-	}
-	
 	ClearTimer(patrolTimer);
 	ClearTimer(attackTimer); 
 	StopMontage(attackMontage);
@@ -316,9 +309,9 @@ void AEnemy::StartChasing(AActor* targetActor)
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(DamageAmount,DamageEvent, EventInstigator,DamageCauser);
 	if (healthComponent && healthBarWidgetComponet) {
 
-		healthComponent->ReceiveDamage(DamageAmount);
 		healthBarWidgetComponet->SetHealthBarPercent(healthComponent->GetHealthPercent());
 		
 	}

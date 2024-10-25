@@ -59,6 +59,16 @@ void ABaseCharacter::DisableCapusleCollider()
 void ABaseCharacter::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
 {
 	
+	if (IsAlive())
+	{
+		HitDirection(hittingActor->GetActorLocation());
+
+	}
+	else
+	{
+
+		OnDeath();
+	}
 
 	PlayHitSound(impactPoint);
 	PlayBloodVFX(impactPoint);
@@ -80,7 +90,7 @@ FVector ABaseCharacter::GetMotionwarpTranslationTargetLocation()
 
 	combatTOMe *= motionwarpDistance;
 	 
-	return myLocation + combatTOMe;
+	return combatTargetLocation + combatTOMe;
 	
 }
 
@@ -195,6 +205,15 @@ void ABaseCharacter::PlayMontage(UAnimMontage* montage, FName sectionName)
 		animInstance->Montage_Play(montage);
 		animInstance->Montage_JumpToSection(sectionName, montage);
 	}
+}
+
+float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (healthComponent)
+	{
+		healthComponent->ReceiveDamage(DamageAmount);
+	}
+	return DamageAmount;
 }
 
 void ABaseCharacter::StopMontage(UAnimMontage* montage)
