@@ -66,10 +66,37 @@ void ABaseCharacter::GetHit_Implementation(const FVector& impactPoint, AActor* h
 	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
 }
 
+FVector ABaseCharacter::GetMotionwarpTranslationTargetLocation()
+{
+	if (!combatTarget)
+	{
+		return FVector();
+	}
+
+	FVector combatTargetLocation = combatTarget->GetActorLocation();
+	FVector myLocation = GetActorLocation();
+
+	FVector combatTOMe = (myLocation - combatTargetLocation).GetSafeNormal();
+
+	combatTOMe *= motionwarpDistance;
+	 
+	return myLocation + combatTOMe;
+	
+}
 
 
 
 
+
+
+FVector ABaseCharacter::GetMotionwarpTargetRotation()
+{
+	if (combatTarget)
+	{
+		return combatTarget->GetActorLocation();
+	}
+	return FVector();
+}
 
 void ABaseCharacter::HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType)
 {
