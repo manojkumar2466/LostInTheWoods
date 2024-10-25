@@ -35,6 +35,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = VFX)
 	UParticleSystem* bloodVFX;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AActor* combatTarget;
+
+
 	UPROPERTY(EditAnywhere, Category = Montage)
 	UAnimMontage* deathMontage;
 
@@ -58,6 +62,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* attackMontage;
 
+	UPROPERTY(EditAnywhere)
+	float motionwarpDistance = 75.f;
+
 	virtual void Attack();
 
 	UFUNCTION(BlueprintCallable)
@@ -66,6 +73,12 @@ protected:
 	void DisableCapusleCollider();
 
 	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor);
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetMotionwarpTranslationTargetLocation();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetMotionwarpTargetRotation();
 
 	UFUNCTION(BlueprintCallable)
 	void HandleWeaponBoxCollision(ECollisionEnabled::Type collisionType);

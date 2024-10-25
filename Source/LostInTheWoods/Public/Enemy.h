@@ -127,9 +127,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float attackMaxTime;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	AActor* combatTarget;	
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEnemyDeathPose enemyDeathPose = EEnemyDeathPose::EDS_DeathPose1;
 
