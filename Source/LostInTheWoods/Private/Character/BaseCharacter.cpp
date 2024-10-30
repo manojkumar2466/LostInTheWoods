@@ -42,7 +42,10 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ABaseCharacter::Attack()
 {
-	
+	if (combatTarget && combatTarget->ActorHasTag(FName("Dead")))
+	{
+		combatTarget = nullptr;
+	}
 	
 }
 
@@ -161,6 +164,8 @@ bool ABaseCharacter::IsAlive()
 void ABaseCharacter::OnDeath()
 {	
 		
+	Tags.Empty();
+	Tags.Add("Dead");
 	PlayDeathMontage();
 	TEnumAsByte<EEnemyDeathPose> characterDeathPose(deathPoseIndex);
 	deathPose = characterDeathPose;
