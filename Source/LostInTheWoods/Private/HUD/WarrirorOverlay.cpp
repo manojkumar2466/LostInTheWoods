@@ -3,6 +3,7 @@
 
 #include "HUD/WarrirorOverlay.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 void UWarrirorOverlay::SetHealthProgressBar(float percent)
 {
@@ -12,4 +13,9 @@ void UWarrirorOverlay::SetHealthProgressBar(float percent)
 void UWarrirorOverlay::SetStaminaProgressBar(float percent)
 {
 	StaminaProgressBar->SetPercent(percent);
+}
+
+void UWarrirorOverlay::SetSoulCount(float count)
+{
+	SoulText->SetText((FText::FromString(FString::Printf(TEXT("%f"), count))));
 }

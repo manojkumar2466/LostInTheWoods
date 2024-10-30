@@ -30,9 +30,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	float maxHealth;
 
+	UPROPERTY(EditAnywhere)
+	float stamina;
+
+	UPROPERTY(EditAnywhere)
+	float maxStamina;
+
 	void ReceiveDamage(float damage);
 
 	float GetHealthPercent();
+
+	float GetStaminaPercent();
 
 	bool IsAlive();
 		

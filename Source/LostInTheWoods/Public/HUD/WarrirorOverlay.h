@@ -31,5 +31,5 @@ public:
 
 	void SetStaminaProgressBar(float percent);
 
-	
+	void SetSoulCount(float count);
 };

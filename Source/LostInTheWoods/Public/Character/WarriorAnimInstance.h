@@ -32,5 +32,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "States")
 	ECharacterWeaponEquipState characterState;
 
+	UPROPERTY(BlueprintReadOnly, Category = "States")
+	ECharacterActionState actionState;
+
+	UPROPERTY(BlueprintReadOnly, Category = "States")
+	EEnemyDeathPose deathPose;
+
 
 };

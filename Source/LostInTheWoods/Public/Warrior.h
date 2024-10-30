@@ -29,7 +29,7 @@ public:
 
 	FORCEINLINE void SetOverlapingItem(class AItem* item){ overlappingItem= item;}
 
-
+	FORCEINLINE ECharacterActionState GetWarriorActionState() { return actionState; }
 	//HitInterface
 	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor) override;
 
@@ -52,10 +52,13 @@ protected:
 
 	virtual void Attack() override;
 
+	virtual void Jump() override;
+
+	virtual void OnDeath() override;
+
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerActionToUnoccupied();
 
-	
 
 
 private:
@@ -78,7 +81,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta =(AllowPrivateAccess= "true"), Category = Combat)
 	ECharacterActionState actionState = ECharacterActionState::ECAS_Unoccupied;
 
+	class UWarrirorOverlay* warriorOverlay;
 
+
+	void CreateWarriorHUD();
 
 	// input functions start
 	void MoveForward(float value);
@@ -103,6 +109,7 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void Disarm();
 
+	void UpdateHealthProgressBar();
 
 
 };
