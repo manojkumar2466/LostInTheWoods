@@ -276,6 +276,10 @@ void AEnemy::PatrolCheck()
 void AEnemy::Attack()
 {
 	Super::Attack();
+	if (!combatTarget)
+	{
+		return;
+	}
 	currentState = EEnemyState::EES_Engaged;
 	PlayAttackMontage();
 
