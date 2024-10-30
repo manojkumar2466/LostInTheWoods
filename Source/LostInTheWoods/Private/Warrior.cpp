@@ -8,6 +8,10 @@
 #include "Items/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/StaticMeshComponent.h"
+#include "HUD/WarriorHUD.h"
+
+#include "HUD/WarrirorOverlay.h"
+#include "Components/HealthComponent.h"
 
 // Sets default values
 AWarrior::AWarrior()
@@ -38,7 +42,8 @@ AWarrior::AWarrior()
 void AWarrior::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	 
+	CreateWarriorHUD();
 }
 
 void AWarrior::Attack()
@@ -50,12 +55,29 @@ void AWarrior::Attack()
 	}
 }
 
+void AWarrior::Jump()
+{
+	if (healthComponent->IsAlive())
+	{
+		Super::Jump();
+	}
+}
+
+void AWarrior::OnDeath()
+{
+	Super::OnDeath();
+	actionState = ECharacterActionState::ECAS_Dead;
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 
 
 void AWarrior::SetPlayerActionToUnoccupied()
 {
 	actionState = ECharacterActionState::ECAS_Unoccupied;
 }
+
+
 
 
 void AWarrior::Tick(float DeltaTime)
@@ -68,8 +90,12 @@ void AWarrior::GetHit_Implementation(const FVector& impactPoint, AActor* hitting
 {
 	Super::GetHit_Implementation(impactPoint,  hittingActor);
 	HandleWeaponBoxCollision(ECollisionEnabled::NoCollision);
-	HitDirection(hittingActor->GetActorLocation());
-	actionState = ECharacterActionState::ECAS_HitReact;
+	if (healthComponent->IsAlive())
+	{
+		HitDirection(hittingActor->GetActorLocation());
+		actionState = ECharacterActionState::ECAS_HitReact;
+	}
+	
 	
 
 	
@@ -77,7 +103,11 @@ void AWarrior::GetHit_Implementation(const FVector& impactPoint, AActor* hitting
 
 float AWarrior::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	UpdateHealthProgressBar();
+	
 	return DamageAmount;
+
 }
 
 // Called to bind functionality to input
@@ -88,12 +118,34 @@ void AWarrior::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis(FName("MoveRight"), this, &AWarrior::MoveRight);
 	PlayerInputComponent->BindAxis(FName("Turn"), this, &AWarrior::Turn);
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &AWarrior::LookUp);
-	PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Pressed, this, &AWarrior::Jump);
 	PlayerInputComponent->BindAction(FName("Equip"), EInputEvent::IE_Pressed, this, &AWarrior::EKeyPressed);
 	PlayerInputComponent->BindAction(FName("Attack"), EInputEvent::IE_Pressed, this, &AWarrior::Attack);
 
 }
 
+
+void AWarrior::CreateWarriorHUD()
+{
+	APlayerController* playerController = Cast<APlayerController>(GetController());
+	if (playerController)
+	{
+
+		AWarriorHUD* warriorHUD = Cast<AWarriorHUD>(playerController->GetHUD());
+
+		if (warriorHUD)
+		{
+			warriorOverlay = warriorHUD->GetWarriorOverlay();
+
+			if (warriorOverlay && healthComponent)
+			{
+				warriorOverlay->SetHealthProgressBar(healthComponent->GetHealthPercent());
+				warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+				warriorOverlay->SetSoulCount(5);
+			}
+		}
+	}
+}
 
 void AWarrior::MoveForward(float value)
 {
@@ -182,6 +234,14 @@ void AWarrior::EquipWeaponFromBack()
 void AWarrior::Disarm()
 {
 	AttachComponentToMesh(FName("WeaponSocket"));
+}
+
+void AWarrior::UpdateHealthProgressBar()
+{
+	if (warriorOverlay && healthComponent)
+	{
+		warriorOverlay->SetHealthProgressBar(healthComponent->GetHealthPercent());
+	}
 }
 
 void AWarrior::HitReactEnd()

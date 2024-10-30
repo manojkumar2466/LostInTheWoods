@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/DamagableInterface.h"
+#include "EnumTypes.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()
@@ -24,7 +25,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
  
-
+	FORCEINLINE EEnemyDeathPose GetDeathPose() { return deathPose; }
 private:
 
 	
@@ -45,6 +46,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FName> deathMontageSectionNames;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EEnemyDeathPose deathPose = EEnemyDeathPose::EDS_DeathPose1;
 
 	int deathPoseIndex;
 

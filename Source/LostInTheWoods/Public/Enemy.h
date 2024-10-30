@@ -128,8 +128,7 @@ protected:
 	float attackMaxTime;
 
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EEnemyDeathPose enemyDeathPose = EEnemyDeathPose::EDS_DeathPose1;
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EEnemyState currentState = EEnemyState::EES_Patrolling;

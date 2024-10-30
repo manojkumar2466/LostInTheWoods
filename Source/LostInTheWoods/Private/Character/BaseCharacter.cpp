@@ -159,9 +159,12 @@ bool ABaseCharacter::IsAlive()
 }
 
 void ABaseCharacter::OnDeath()
-{
-	
+{	
+		
 	PlayDeathMontage();
+	TEnumAsByte<EEnemyDeathPose> characterDeathPose(deathPoseIndex);
+	deathPose = characterDeathPose;
+	
 }
 
 void ABaseCharacter::PlayAttackMontage()
@@ -179,7 +182,7 @@ void ABaseCharacter::PlayBloodVFX(const FVector& impactPoint)
 }
 
 void ABaseCharacter::PlayDeathMontage()
-{
+{ 
 	int sectionNameIndex = FMath::RandRange(0, deathMontageSectionNames.Num() - 1);
 	deathPoseIndex = sectionNameIndex;
 	PlayMontage(deathMontage, deathMontageSectionNames[sectionNameIndex]);
@@ -212,6 +215,11 @@ float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	if (healthComponent)
 	{
 		healthComponent->ReceiveDamage(DamageAmount);
+		UE_LOG(LogTemp, Warning, TEXT("damage received"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("healthcomponent is null"));
 	}
 	return DamageAmount;
 }

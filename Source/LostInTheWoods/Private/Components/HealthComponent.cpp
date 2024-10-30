@@ -18,8 +18,6 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
 }
 
@@ -31,6 +29,11 @@ void UHealthComponent::ReceiveDamage(float damage)
 float UHealthComponent::GetHealthPercent()
 {
 	return health/maxHealth;
+}
+
+float UHealthComponent::GetStaminaPercent()
+{
+	return stamina/maxStamina;
 }
 
 bool UHealthComponent::IsAlive()

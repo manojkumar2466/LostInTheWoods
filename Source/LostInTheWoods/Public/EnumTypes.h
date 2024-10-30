@@ -15,8 +15,10 @@ enum class ECharacterActionState : uint8
 	ECAS_HitReact UMETA(DisplayName="Hit React"),
 	ECAS_Attacking UMETA(DisplayName="Attacking"),
 	ECAS_EquipingWeapon UMETA(DisplayName="Equiping weapon"),
-	ECAS_DisarmWeapon UMETA(DisplayName = "Disarm weapon")
+	ECAS_DisarmWeapon UMETA(DisplayName = "Disarm weapon"),
+	ECAS_Dead UMETA(DisplayName = "Dead")
 };
+
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8

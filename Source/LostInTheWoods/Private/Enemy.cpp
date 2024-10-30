@@ -252,10 +252,8 @@ void AEnemy::OnPawnSeen(APawn* pawn)
 
 void AEnemy::OnDeath()
 {
-	Super::OnDeath();
+	Super::OnDeath();	
 	currentState = EEnemyState::EES_Dead;
-	TEnumAsByte<EEnemyDeathPose> deathPose(deathPoseIndex);
-	enemyDeathPose = deathPose;
 	HandleWeaponBoxCollision(ECollisionEnabled::NoCollision);
 	HandleHealthBarWidgetVisibility(false);
 	DisableCapusleCollider();
