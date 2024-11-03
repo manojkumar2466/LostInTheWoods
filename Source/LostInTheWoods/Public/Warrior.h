@@ -26,8 +26,9 @@ public:
 	//Input Function End
 
 	FORCEINLINE ECharacterWeaponEquipState GetCharacterState() { return characterWeaponState; }
-
-	FORCEINLINE void SetOverlapingItem(class AItem* item){ overlappingItem= item;}
+ 
+	void SetOverlapingItem(class AItem* item) override;
+	virtual void AddSouls(class ASoul* soul) override;
 
 	FORCEINLINE ECharacterActionState GetWarriorActionState() { return actionState; }
 	//HitInterface

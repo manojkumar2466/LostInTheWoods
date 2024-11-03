@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "HUD/WarriorHUD.h"
+#include "Items/Soul.h"
 
 #include "HUD/WarrirorOverlay.h"
 #include "Components/HealthComponent.h"
@@ -85,6 +86,22 @@ void AWarrior::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+void AWarrior::SetOverlapingItem(AItem* item)
+{
+	overlappingItem = item;
+}
+
+void AWarrior::AddSouls(ASoul* soul)
+{
+	if (healthComponent && warriorOverlay)
+	{
+		healthComponent->AddSouls(soul->GetSoulValue());
+		warriorOverlay->SetSoulCount(healthComponent->GetSouls());
+	}
+}
+
+
 
 void AWarrior::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
 {

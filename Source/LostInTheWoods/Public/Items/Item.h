@@ -27,6 +27,13 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+
+	void PlayPickupSound();
+	void SpawnPickupVFX();
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* pickupSound;
+
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* sphere;
 
@@ -34,13 +41,20 @@ protected:
 	UStaticMeshComponent* mesh;
 
 	UPROPERTY(EditAnywhere)
-	float waveSpeed;
+	float waveSpeed=2;
 	UPROPERTY(EditAnywhere)
-	float sinAmplitude;
+	float sinAmplitude=1;
 	UPROPERTY(EditAnywhere)
-	float sinValue;
+	float sinValue=2;
 	UPROPERTY(EditAnywhere)
-	float spinRate;
+	float spinRate=2;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraComponent* itemEffect;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* pickupVFX;
+	
 
 	EWeaponState weaponState = EWeaponState::EWS_Hovering;
 

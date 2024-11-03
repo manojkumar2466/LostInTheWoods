@@ -3,6 +3,12 @@
 
 #include "Interfaces/Pickup.h"
 
-// Add default functionality here for any IPickup functions that are not pure virtual.
+void IPickup::SetOverlapingItem(AItem* item)
+{
 
+}
 
+void IPickup::AddSouls(ASoul* soul)
+{
+
+}

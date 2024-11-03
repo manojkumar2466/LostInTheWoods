@@ -36,6 +36,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	float maxStamina;
 
+	UPROPERTY(VisibleAnywhere)
+	int souls;
+
+
+
 	void ReceiveDamage(float damage);
 
 	float GetHealthPercent();
@@ -43,5 +48,9 @@ public:
 	float GetStaminaPercent();
 
 	bool IsAlive();
+
+	void AddSouls(int value);
+
+	FORCEINLINE int GetSouls() { return souls; };
 		
 };
