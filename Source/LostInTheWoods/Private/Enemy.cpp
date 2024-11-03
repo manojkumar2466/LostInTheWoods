@@ -10,6 +10,7 @@
 #include "AIController.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Items/Weapon.h"
+#include "Items/Soul.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -185,6 +186,17 @@ void AEnemy::StartPatroling()
 	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
 }
 
+void AEnemy::SpawnSoul()
+{
+	UWorld* world = GetWorld();
+	if (world && healthComponent && soulClass)
+	{
+		FVector spawnLocation = GetActorLocation() + FVector(0.f, 0.f, 25.f);
+		ASoul* spawnedSoul = world->SpawnActor<ASoul>(soulClass,spawnLocation,GetActorRotation() );
+		spawnedSoul->SetSouls(healthComponent->GetSouls());
+	}
+}
+
 bool AEnemy::CanAttack()
 {
 	return IsInRange(combatTarget, attackingRadius) && currentState != EEnemyState::EES_Attacking && currentState!=EEnemyState::EES_Dead && currentState!= EEnemyState::EES_Engaged;
@@ -258,7 +270,8 @@ void AEnemy::OnDeath()
 	HandleHealthBarWidgetVisibility(false);
 	DisableCapusleCollider();
 	ClearTimer(attackTimer);
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->bOrientRotationToMovement = false;	
+    GetWorldTimerManager().SetTimer(soulSpawnTimer,this, &AEnemy::SpawnSoul,1.f, false );
 }
 
 

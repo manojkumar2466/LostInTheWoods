@@ -36,7 +36,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float maxStamina;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	int souls;
 
 

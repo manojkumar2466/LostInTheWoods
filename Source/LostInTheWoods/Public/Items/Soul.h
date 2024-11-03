@@ -22,5 +22,6 @@ public:
 
 	virtual void OnSphereOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	FORCEINLINE int GetSoulValue() { return soulValue; }
+	FORCEINLINE void SetSouls(int value) { soulValue = value; }
 	
 };

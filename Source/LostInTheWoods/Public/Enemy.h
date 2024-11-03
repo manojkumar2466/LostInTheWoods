@@ -135,6 +135,11 @@ protected:
 
 	FTimerHandle attackTimer;
 
+	FTimerHandle soulSpawnTimer;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ASoul> soulClass;
+
 	
 	virtual void Attack() override;
 
@@ -151,7 +156,7 @@ protected:
 	void StartPatroling();
 
 	
-
+	void SpawnSoul();
 
 
 public:
