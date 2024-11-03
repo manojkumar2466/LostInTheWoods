@@ -3,8 +3,11 @@
 
 #include "Items/Item.h"
 #include "Components/SphereComponent.h"
+#include "Interfaces/Pickup.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
-#include "Warrior.h"
 
 // Sets default values
 AItem::AItem()
@@ -23,6 +26,9 @@ AItem::AItem()
 	mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	mesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 
+	itemEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("VFX"));
+	itemEffect->SetupAttachment(GetRootComponent());
+	
 }
 
 // Called when the game starts or when spawned
@@ -36,9 +42,9 @@ void AItem::BeginPlay()
 
 void AItem::OnSphereOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AWarrior* warrior = Cast<AWarrior>(OtherActor);
-	if (warrior) {
-		warrior->SetOverlapingItem(this);
+	IPickup* pickupInterface = Cast<IPickup>(OtherActor);
+	if (pickupInterface) {
+		pickupInterface->SetOverlapingItem(this);
 
 	}
 	
@@ -46,10 +52,27 @@ void AItem::OnSphereOverlapStart(UPrimitiveComponent* OverlappedComponent, AActo
 
 void AItem::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	AWarrior* warrior = Cast<AWarrior>(OtherActor);
-	if (warrior) {
-		warrior->SetOverlapingItem(nullptr);
+	IPickup* pickupInterface = Cast<IPickup>(OtherActor);
+	if (pickupInterface) 
+	{
+		pickupInterface->SetOverlapingItem(nullptr);
 
+	}
+}
+
+void AItem::PlayPickupSound()
+{
+	if (pickupSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this, pickupSound, GetActorLocation());
+	}
+}
+
+void AItem::SpawnPickupVFX()
+{
+	if (pickupVFX)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, pickupVFX, GetActorLocation());
 	}
 }
 

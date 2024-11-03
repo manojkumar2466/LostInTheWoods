@@ -41,6 +41,11 @@ bool UHealthComponent::IsAlive()
 	return health>0.f;
 }
 
+void UHealthComponent::AddSouls(int value)
+{
+	souls += value;
+}
+
 
 // Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
