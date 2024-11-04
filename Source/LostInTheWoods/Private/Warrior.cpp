@@ -10,7 +10,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "HUD/WarriorHUD.h"
 #include "Items/Soul.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/WarrirorOverlay.h"
 #include "Components/HealthComponent.h"
 
@@ -46,14 +46,58 @@ void AWarrior::BeginPlay()
 	 
 	CreateWarriorHUD();
 }
+void AWarrior::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (canRun && warriorOverlay && healthComponent)
+	{
+		healthComponent->UseStamina(healthComponent->GetStaminaRateToRun() * DeltaTime);
+		warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+		
+		
+	}
+	if (!canRun && warriorOverlay && healthComponent)
+	{
+		healthComponent->RegenerateStamina(DeltaTime);
+		warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+	}
+
+}
 
 void AWarrior::Attack()
 {
 	Super::Attack();
-	if (CanAttack()) {
+	if (CanAttack() && healthComponent->GetStaminaPercent()*100> healthComponent->GetMinStaminaToAttack()) {
 		PlayAttackMontage();
 		actionState = ECharacterActionState::ECAS_Attacking;
+		healthComponent->UseStamina(healthComponent->GetMinStaminaToAttack());
+		if (warriorOverlay)
+		{
+			warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+		}
 	}
+}
+
+void AWarrior::Dodge()
+{
+	if ( healthComponent->GetStaminaPercent()*100 < healthComponent->GetMinStaminaToDodge() ||  actionState != ECharacterActionState::ECAS_Unoccupied)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("health percent:%f\n minStaminaRequired To dodge:%f"), healthComponent->GetStaminaPercent() * 100, healthComponent->GetMinStaminaToDodge());
+		return;
+	}
+	healthComponent->UseStamina(healthComponent->GetMinStaminaToDodge());
+	actionState = ECharacterActionState::ECAS_Dodge;
+	PlayMontage(dodgeMontage, FName("Dodge"));
+	if (warriorOverlay)
+	{
+		warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+	}
+	
+}
+
+void AWarrior::DodgeEnd()
+{
+	actionState = ECharacterActionState::ECAS_Unoccupied;
 }
 
 void AWarrior::Jump()
@@ -81,11 +125,7 @@ void AWarrior::SetPlayerActionToUnoccupied()
 
 
 
-void AWarrior::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-}
 
 void AWarrior::SetOverlapingItem(AItem* item)
 {
@@ -138,6 +178,9 @@ void AWarrior::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Pressed, this, &AWarrior::Jump);
 	PlayerInputComponent->BindAction(FName("Equip"), EInputEvent::IE_Pressed, this, &AWarrior::EKeyPressed);
 	PlayerInputComponent->BindAction(FName("Attack"), EInputEvent::IE_Pressed, this, &AWarrior::Attack);
+	PlayerInputComponent->BindAction(FName("Dodge"), EInputEvent::IE_Pressed, this, &AWarrior::Dodge);
+	PlayerInputComponent->BindAxis(FName("Run"),this,&AWarrior::StartRun);
+	PlayerInputComponent->BindAction(FName("StopRun"), EInputEvent::IE_Released, this, &AWarrior::StopRun);
 
 }
 
@@ -167,6 +210,15 @@ void AWarrior::CreateWarriorHUD()
 void AWarrior::MoveForward(float value)
 {
 	if (Controller&& value != 0 && actionState== ECharacterActionState::ECAS_Unoccupied) {
+
+		if (canRun)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+		}
+		else
+		{
+			GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+		}
 		FRotator controllerRotation = Controller->GetControlRotation();//COntroller does have forward vector, sp we are taking controllers rotation
 		FRotator yawRotation(0.f, controllerRotation.Yaw, 0.f);
 
@@ -196,6 +248,27 @@ void AWarrior::Turn(float value)
 void AWarrior::LookUp(float value)
 {
 	AddControllerPitchInput(value);
+}
+
+void AWarrior::StartRun(float value)
+{
+	if (healthComponent->GetStaminaPercent()*100 <=1.f)
+	{
+		canRun = false;
+		return;
+	}
+
+	if (value > 0 &&  healthComponent && healthComponent->GetStaminaPercent()*100>healthComponent->GetMinStaminaToRun())
+	{
+		canRun = true;
+	}
+	
+	
+}
+
+void AWarrior::StopRun()
+{
+	canRun = false;
 }
 	
 bool AWarrior::CanAttack()
@@ -242,6 +315,11 @@ void AWarrior::EKeyPressed()
 	}
 		
 
+}
+
+bool AWarrior::CanRun()
+{
+	return canRun;
 }
 
 void AWarrior::EquipWeaponFromBack()

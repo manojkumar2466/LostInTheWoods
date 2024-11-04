@@ -22,7 +22,7 @@ public:
 
 	//Input Function start
 	void EKeyPressed();
-	
+	bool CanRun();
 	//Input Function End
 
 	FORCEINLINE ECharacterWeaponEquipState GetCharacterState() { return characterWeaponState; }
@@ -42,17 +42,25 @@ protected:
 
 	class AItem* overlappingItem;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool canRun = false;
 	//Monatge section
-	
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* dodgeMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* swordEquipMontage;
+
+	
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	virtual void Attack() override;
+	void Dodge();
 
+	UFUNCTION(BlueprintCallable)
+	void DodgeEnd();
 	virtual void Jump() override;
 
 	virtual void OnDeath() override;
@@ -64,7 +72,13 @@ protected:
 
 private:
 
+	bool canUseLeftOverStaminaToRun = true;
+	UPROPERTY(EditAnywhere)
+	float walkSpeed=150.f;
 
+	UPROPERTY(EditAnywhere)
+	float runSpeed=600.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category=Components)
 	class USpringArmComponent* springArm;
 
@@ -92,6 +106,9 @@ private:
 	void MoveRight(float value);
 	void Turn(float value);
 	void LookUp(float value);
+	void StartRun(float value);
+	void StopRun();
+	
 	
 	//input functions end
 

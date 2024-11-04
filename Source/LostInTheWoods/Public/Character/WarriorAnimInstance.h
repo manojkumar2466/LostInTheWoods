@@ -29,6 +29,8 @@ protected:
 	float speed;
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
 	bool isFalling;
+	UPROPERTY(BlueprintReadOnly, Category = "Movement")
+	bool canRun;
 	UPROPERTY(BlueprintReadOnly, Category = "States")
 	ECharacterWeaponEquipState characterState;
 

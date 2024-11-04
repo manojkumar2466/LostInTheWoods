@@ -22,8 +22,8 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	
+private:
+
 	UPROPERTY(EditAnywhere)
 	float health;
 
@@ -31,14 +31,32 @@ public:
 	float maxHealth;
 
 	UPROPERTY(EditAnywhere)
-	float stamina;
+	float stamina = 100;
 
 	UPROPERTY(EditAnywhere)
-	float maxStamina;
+	float maxStamina = 100;
+
+	UPROPERTY(EditAnywhere)
+	float minStaminaToAttack = 10;
+
+	UPROPERTY(EditAnywhere)
+	float MinStaminaToDodge = 15;
+
+	UPROPERTY(EditAnywhere)
+	float staminaIncreaseRate = 2;
+
+	UPROPERTY(EditAnywhere)
+	float minStaminaToRun = 10;
+
+	UPROPERTY(EditAnywhere)
+	float useStaminaToRun = 1;
 
 	UPROPERTY(EditAnywhere)
 	int souls;
 
+
+public:		
+	
 
 
 	void ReceiveDamage(float damage);
@@ -46,6 +64,13 @@ public:
 	float GetHealthPercent();
 
 	float GetStaminaPercent();
+	float GetMinStaminaToAttack();
+	float GetMinStaminaToDodge();
+	float GetStaminsIncreaseRate();
+	float GetMinStaminaToRun();
+	float GetStaminaRateToRun();
+	void RegenerateStamina(float DeltaTime);
+	void UseStamina(float value);
 
 	bool IsAlive();
 
