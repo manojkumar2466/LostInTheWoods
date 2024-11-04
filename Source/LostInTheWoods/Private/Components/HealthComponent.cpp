@@ -36,6 +36,41 @@ float UHealthComponent::GetStaminaPercent()
 	return stamina/maxStamina;
 }
 
+float UHealthComponent::GetMinStaminaToAttack()
+{
+	return minStaminaToAttack;
+}
+
+float UHealthComponent::GetMinStaminaToDodge()
+{
+	return MinStaminaToDodge;
+}
+
+float UHealthComponent::GetStaminsIncreaseRate()
+{
+	return staminaIncreaseRate;
+}
+
+float UHealthComponent::GetMinStaminaToRun()
+{
+	return minStaminaToRun;
+}
+
+float UHealthComponent::GetStaminaRateToRun()
+{
+	return useStaminaToRun;
+}
+
+void UHealthComponent::RegenerateStamina(float DeltaTime)
+{
+	stamina = FMath::Clamp(stamina + staminaIncreaseRate * DeltaTime, 0, maxStamina);
+}
+
+void UHealthComponent::UseStamina(float value)
+{
+	stamina =  FMath::Clamp(stamina- value, 0, maxStamina);
+}
+
 bool UHealthComponent::IsAlive()
 {
 	return health>0.f;
@@ -51,7 +86,7 @@ void UHealthComponent::AddSouls(int value)
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	// ...
 }
 

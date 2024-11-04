@@ -24,5 +24,6 @@ void UWarriorAnimInstance::NativeUpdateAnimation(float deltaTime)
 		characterState = warrior->GetCharacterState();
 		actionState = warrior->GetWarriorActionState();
 		deathPose = warrior->GetDeathPose();
+		canRun = warrior->CanRun();
 	}
 }

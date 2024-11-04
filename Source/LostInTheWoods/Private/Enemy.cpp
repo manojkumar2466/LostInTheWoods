@@ -271,7 +271,7 @@ void AEnemy::OnDeath()
 	DisableCapusleCollider();
 	ClearTimer(attackTimer);
 	GetCharacterMovement()->bOrientRotationToMovement = false;	
-    GetWorldTimerManager().SetTimer(soulSpawnTimer,this, &AEnemy::SpawnSoul,1.f, false );
+    GetWorldTimerManager().SetTimer(soulSpawnTimer,this, &AEnemy::SpawnSoul,1.5f, false );
 }
 
 
