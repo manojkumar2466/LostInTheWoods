@@ -61,7 +61,9 @@ void AWeapon::OnBoxOverlapStart(UPrimitiveComponent* OverlappedComponent, AActor
 				damage, GetInstigator()->GetController(),
 				this,
 				UDamageType::StaticClass());
-			hitActor->Execute_GetHit(hitResult.GetActor(), hitResult.ImpactPoint, GetOwner());
+			AActor* owner = GetOwner();
+			hitActor->Execute_TakeHit(hitResult.GetActor(), hitResult.ImpactPoint, owner);
+			//hitActor->Execute_GetHit(hitResult.GetActor(), hitResult.ImpactPoint, GetOwner());
 
 		}
 		ignoreActors.AddUnique(hitResult.GetActor());

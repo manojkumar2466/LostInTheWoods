@@ -143,19 +143,17 @@ void AWarrior::AddSouls(ASoul* soul)
 
 
 
-void AWarrior::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
+
+void AWarrior::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActor)
 {
-	Super::GetHit_Implementation(impactPoint,  hittingActor);
+	Super::TakeHit_Implementation(pointOfImpact, imHittingActor);
 	HandleWeaponBoxCollision(ECollisionEnabled::NoCollision);
 	if (healthComponent->IsAlive())
 	{
-		HitDirection(hittingActor->GetActorLocation());
+		HitDirection(imHittingActor->GetActorLocation());
 		actionState = ECharacterActionState::ECAS_HitReact;
 	}
-	
-	
 
-	
 }
 
 float AWarrior::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

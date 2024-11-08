@@ -24,5 +24,5 @@ class LOSTINTHEWOODS_API IDamagableInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent)
-	void GetHit(const FVector& impactPoint, AActor* hittingActor);
+	void TakeHit(FVector pointOfImpact, AActor* ImHittingActor);
 };

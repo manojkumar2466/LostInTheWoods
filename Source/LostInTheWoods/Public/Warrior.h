@@ -32,8 +32,7 @@ public:
 
 	FORCEINLINE ECharacterActionState GetWarriorActionState() { return actionState; }
 	//HitInterface
-	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor) override;
-
+	virtual void TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActor) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	// Called to bind functionality to input

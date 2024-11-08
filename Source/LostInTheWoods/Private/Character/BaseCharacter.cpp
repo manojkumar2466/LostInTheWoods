@@ -59,12 +59,24 @@ void ABaseCharacter::DisableCapusleCollider()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void ABaseCharacter::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
+void ABaseCharacter::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActor)
 {
-	
+	if (pointOfImpact== FVector(0)) {
+		UE_LOG(LogTemp, Error, TEXT("impact point is null"));
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("impact point NOT null"));
+	}
+	if (!imHittingActor) {
+		UE_LOG(LogTemp, Error, TEXT("impact point is null"));
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("impact point NOT null"));
+	}
+
 	if (IsAlive())
 	{
-		HitDirection(hittingActor->GetActorLocation());
+		HitDirection(imHittingActor->GetActorLocation());
 
 	}
 	else
@@ -73,11 +85,13 @@ void ABaseCharacter::GetHit_Implementation(const FVector& impactPoint, AActor* h
 		OnDeath();
 	}
 
-	PlayHitSound(impactPoint);
-	PlayBloodVFX(impactPoint);
+	PlayHitSound(pointOfImpact);
+	PlayBloodVFX(pointOfImpact);
 
-	DrawDebugSphere(GetWorld(), impactPoint, 8.f, 32.f, FColor::Blue, false, 5.f);
+	DrawDebugSphere(GetWorld(), pointOfImpact, 8.f, 32.f, FColor::Blue, false, 5.f);
 }
+
+
 
 FVector ABaseCharacter::GetMotionwarpTranslationTargetLocation()
 {
