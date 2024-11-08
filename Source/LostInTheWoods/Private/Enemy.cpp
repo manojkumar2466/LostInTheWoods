@@ -152,18 +152,6 @@ void AEnemy::CombatCheck()
 	}
 }
 
-void AEnemy::GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor)
-{
-	Super::GetHit_Implementation(impactPoint, hittingActor);
-	if (IsAlive())
-	{
-
-		HandleHealthBarWidgetVisibility(true);
-	}
-	ClearTimer(patrolTimer);
-	ClearTimer(attackTimer); 
-	StopMontage(attackMontage);
-}
 
 void AEnemy::HandleHealthBarWidgetVisibility(bool isVisible)
 {
@@ -320,6 +308,21 @@ void AEnemy::StartChasing(AActor* targetActor)
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	MoveToTarget(targetActor,combatAcceptanceRadius);
 	UE_LOG(LogTemp, Warning, TEXT("Chasing"));
+}
+
+void AEnemy::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActor)
+{
+
+	Super::TakeHit_Implementation(pointOfImpact, imHittingActor);
+	if (IsAlive())
+	{
+
+		HandleHealthBarWidgetVisibility(true);
+	}
+	ClearTimer(patrolTimer);
+	ClearTimer(attackTimer);
+	StopMontage(attackMontage);
+
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

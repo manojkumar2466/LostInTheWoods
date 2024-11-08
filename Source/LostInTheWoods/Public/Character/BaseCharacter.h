@@ -76,8 +76,8 @@ protected:
 	virtual void AttackEnd();
 
 	void DisableCapusleCollider();
-
-	virtual void GetHit_Implementation(const FVector& impactPoint, AActor* hittingActor);
+	 
+	virtual void TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActor) override;
 
 	UFUNCTION(BlueprintCallable)
 	FVector GetMotionwarpTranslationTargetLocation();
