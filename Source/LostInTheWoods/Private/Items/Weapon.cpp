@@ -79,6 +79,7 @@ void AWeapon::StartBoxTrace(FHitResult& hitResult)
 
 	TArray<AActor*> ignoreActorList;
 	ignoreActorList.Add(this);
+	ignoreActorList.Add(GetOwner());
 	for (AActor* Actor : ignoreActors) {
 		ignoreActorList.AddUnique(Actor);
 	}

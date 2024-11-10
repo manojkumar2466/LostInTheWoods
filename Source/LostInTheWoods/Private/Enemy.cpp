@@ -322,6 +322,20 @@ void AEnemy::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActo
 	ClearTimer(patrolTimer);
 	ClearTimer(attackTimer);
 	StopMontage(attackMontage);
+	if (IsInRange(patrolTarget, attackingRadius))
+	{
+		if (IsAlive())
+		{
+			
+			StartAttackTimer();
+			UE_LOG(LogTemp, Error, TEXT("Started Attacking"));
+		}
+	}
+	else
+	{
+		float distnace = (patrolTarget->GetActorLocation() - GetActorLocation()).Size();
+		UE_LOG(LogTemp, Error, TEXT("Not in Attacking Range and distance is:%f "), distnace);
+	}
 
 }
 
