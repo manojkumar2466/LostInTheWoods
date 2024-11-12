@@ -305,7 +305,7 @@ void AEnemy::StartChasing(AActor* targetActor)
 {
 	currentState = EEnemyState::EES_Chasing;
 	combatTarget = targetActor;
-	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+	GetCharacterMovement()->MaxWalkSpeed = runSpeed;
 	MoveToTarget(targetActor,combatAcceptanceRadius);
 	UE_LOG(LogTemp, Warning, TEXT("Chasing"));
 }
