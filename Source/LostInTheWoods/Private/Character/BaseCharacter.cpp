@@ -61,19 +61,7 @@ void ABaseCharacter::DisableCapusleCollider()
 
 void ABaseCharacter::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActor)
 {
-	if (pointOfImpact== FVector(0)) {
-		UE_LOG(LogTemp, Error, TEXT("impact point is null"));
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("impact point NOT null"));
-	}
-	if (!imHittingActor) {
-		UE_LOG(LogTemp, Error, TEXT("impact point is null"));
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("impact point NOT null"));
-	}
-
+	
 	if (IsAlive())
 	{
 		HitDirection(imHittingActor->GetActorLocation());

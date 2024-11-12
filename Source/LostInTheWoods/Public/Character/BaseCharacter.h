@@ -70,6 +70,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float motionwarpDistance = 75.f;
 
+	UPROPERTY(EditAnywhere)
+	float runSpeed = 600.f;
+
 	virtual void Attack();
 
 	UFUNCTION(BlueprintCallable)

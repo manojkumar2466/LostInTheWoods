@@ -75,8 +75,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float walkSpeed=150.f;
 
-	UPROPERTY(EditAnywhere)
-	float runSpeed=600.f;
+	
 	
 	UPROPERTY(EditDefaultsOnly, Category=Components)
 	class USpringArmComponent* springArm;
