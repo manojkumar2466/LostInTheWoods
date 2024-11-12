@@ -67,15 +67,18 @@ void AWarrior::Tick(float DeltaTime)
 void AWarrior::Attack()
 {
 	Super::Attack();
-	if (CanAttack() && healthComponent->GetStaminaPercent()*100> healthComponent->GetMinStaminaToAttack()) {
-		PlayAttackMontage();
-		actionState = ECharacterActionState::ECAS_Attacking;
-		healthComponent->UseStamina(healthComponent->GetMinStaminaToAttack());
-		if (warriorOverlay)
-		{
-			warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+	UAnimMontage* montage= GetMontageForAttackType();
+	
+		if (CanAttack() && healthComponent->GetStaminaPercent() * 100 > healthComponent->GetMinStaminaToAttack()) {
+			PlayAttackMontage(montage);
+			actionState = ECharacterActionState::ECAS_Attacking;
+			healthComponent->UseStamina(healthComponent->GetMinStaminaToAttack());
+			if (warriorOverlay)
+			{
+				warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+			}
 		}
-	}
+	
 }
 
 void AWarrior::Dodge()
@@ -120,6 +123,27 @@ void AWarrior::OnDeath()
 void AWarrior::SetPlayerActionToUnoccupied()
 {
 	actionState = ECharacterActionState::ECAS_Unoccupied;
+}
+
+void AWarrior::SwitchToRageAttacks()
+{
+	if (attackType != ECharacterAttackType::ECAT_RageAttack)
+	{
+		attackType = ECharacterAttackType::ECAT_RageAttack;
+	}
+}
+
+void AWarrior::SwitchToLowerAttacks()
+{
+	if (attackType != ECharacterAttackType::ECAT_LowerAttck)
+	{
+		attackType = ECharacterAttackType::ECAT_LowerAttck;
+	}
+}
+
+void AWarrior::SwitchToNormalAttacks()
+{
+	attackType = ECharacterAttackType::ECAT_NormalAttack;
 }
 
 
@@ -179,6 +203,11 @@ void AWarrior::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction(FName("Dodge"), EInputEvent::IE_Pressed, this, &AWarrior::Dodge);
 	PlayerInputComponent->BindAxis(FName("Run"),this,&AWarrior::StartRun);
 	PlayerInputComponent->BindAction(FName("StopRun"), EInputEvent::IE_Released, this, &AWarrior::StopRun);
+	PlayerInputComponent->BindAction(FName("RageAttack"), EInputEvent::IE_Pressed, this, &AWarrior::SwitchToRageAttacks);
+	PlayerInputComponent->BindAction(FName("RageAttack"), EInputEvent::IE_Released, this, &AWarrior::SwitchToNormalAttacks);
+	PlayerInputComponent->BindAction(FName("LowerAttack"), EInputEvent::IE_Pressed, this, &AWarrior::SwitchToLowerAttacks);
+	PlayerInputComponent->BindAction(FName("LowerAttack"), EInputEvent::IE_Released, this, &AWarrior::SwitchToNormalAttacks);
+	
 
 }
 
@@ -340,6 +369,25 @@ void AWarrior::UpdateHealthProgressBar()
 void AWarrior::HitReactEnd()
 {
 	actionState = ECharacterActionState::ECAS_Unoccupied;
+}
+
+UAnimMontage* AWarrior::GetMontageForAttackType()
+{
+	UAnimMontage* montage;
+	switch (attackType)
+	{
+
+	case ECharacterAttackType::ECAT_RageAttack:
+		montage = RageAttackMontage;
+		break;
+	case ECharacterAttackType::ECAT_LowerAttck:
+		montage = LowerAttackMontage;
+		break;
+	default:
+		montage = attackMontage;
+		break;
+	}
+	return montage ;
 }
 
 void AWarrior::AttachComponentToMesh(FName socketName)

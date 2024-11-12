@@ -174,10 +174,14 @@ void ABaseCharacter::OnDeath()
 	
 }
 
-void ABaseCharacter::PlayAttackMontage()
+void ABaseCharacter::PlayAttackMontage(UAnimMontage* montage)
 {
+	if (!montage)
+	{
+		return;
+	}
 	int sectionSelectionIndex = FMath::RandRange(0, attackMontageSectionNames.Num() - 1);
-	PlayMontage(attackMontage, attackMontageSectionNames[sectionSelectionIndex]);
+	PlayMontage(montage, attackMontageSectionNames[sectionSelectionIndex]);
 }
 
 void ABaseCharacter::PlayBloodVFX(const FVector& impactPoint)

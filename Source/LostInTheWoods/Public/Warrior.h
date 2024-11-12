@@ -41,6 +41,8 @@ protected:
 
 	class AItem* overlappingItem;
 
+	ECharacterAttackType attackType= ECharacterAttackType::ECAT_NormalAttack;
+
 	UPROPERTY(BlueprintReadOnly)
 	bool canRun = false;
 	//Monatge section
@@ -50,7 +52,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* swordEquipMontage;
 
-	
+	UPROPERTY(EditAnywhere, Category= Combat)
+	UAnimMontage* RageAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* LowerAttackMontage;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -66,6 +72,10 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerActionToUnoccupied();
+
+	void SwitchToRageAttacks();
+	void SwitchToLowerAttacks();
+	void SwitchToNormalAttacks();
 
 
 
@@ -121,6 +131,8 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
+
+	UAnimMontage* GetMontageForAttackType();
 	void AttachComponentToMesh(FName socketName);
 	UFUNCTION(BlueprintCallable)
 	void Disarm();
