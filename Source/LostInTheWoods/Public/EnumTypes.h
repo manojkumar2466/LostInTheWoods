@@ -47,3 +47,11 @@ enum class EEnemyState : uint8
 	EES_Dead, 
 	EES_NoState
 };
+
+UENUM(BlueprintType)
+enum class ECharacterAttackType : uint8
+{
+	ECAT_NormalAttack UMETA(DisplayName= "Normal Attack"),
+	ECAT_RageAttack UMETA(DisplayName = "Rage Attack"),
+	ECAT_LowerAttck UMETA(DisplayName = "Lower Attack")
+};

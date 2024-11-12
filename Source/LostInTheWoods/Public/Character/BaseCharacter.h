@@ -96,7 +96,7 @@ protected:
 	bool IsAlive();
 	virtual void OnDeath();
 
-	virtual void PlayAttackMontage();
+	virtual void PlayAttackMontage( UAnimMontage* montage);
 
 	void PlayBloodVFX(const FVector& impactPoint);
 	virtual void PlayDeathMontage();

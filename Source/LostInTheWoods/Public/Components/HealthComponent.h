@@ -40,6 +40,9 @@ private:
 	float minStaminaToAttack = 10;
 
 	UPROPERTY(EditAnywhere)
+	float minStaminaForRageAttack = 10;
+
+	UPROPERTY(EditAnywhere)
 	float MinStaminaToDodge = 15;
 
 	UPROPERTY(EditAnywhere)

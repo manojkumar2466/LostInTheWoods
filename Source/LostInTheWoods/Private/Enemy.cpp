@@ -282,7 +282,7 @@ void AEnemy::Attack()
 		return;
 	}
 	currentState = EEnemyState::EES_Engaged;
-	PlayAttackMontage();
+	PlayAttackMontage(attackMontage);
 
 }
 
