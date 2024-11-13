@@ -49,17 +49,17 @@ void AWarrior::BeginPlay()
 void AWarrior::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (canRun && warriorOverlay && healthComponent)
+	if (canRun && warriorOverlay && attributeComponent)
 	{
-		healthComponent->UseStamina(healthComponent->GetStaminaRateToRun() * DeltaTime);
-		warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+		attributeComponent->UseStamina(attributeComponent->GetStaminaRateToRun() * DeltaTime);
+		warriorOverlay->SetStaminaProgressBar(attributeComponent->GetStaminaPercent());
 		
 		
 	}
-	if (!canRun && warriorOverlay && healthComponent)
+	if (!canRun && warriorOverlay && attributeComponent)
 	{
-		healthComponent->RegenerateStamina(DeltaTime);
-		warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+		attributeComponent->RegenerateStamina(DeltaTime);
+		warriorOverlay->SetStaminaProgressBar(attributeComponent->GetStaminaPercent());
 	}
 
 }
@@ -69,13 +69,13 @@ void AWarrior::Attack()
 	Super::Attack();
 	UAnimMontage* montage= GetMontageForAttackType();
 	
-		if (CanAttack() && healthComponent->GetStaminaPercent() * 100 > healthComponent->GetMinStaminaToAttack()) {
+		if (CanAttack() && attributeComponent->GetStaminaPercent() * 100 > attributeComponent->GetMinStaminaToAttack()) {
 			PlayAttackMontage(montage);
 			actionState = ECharacterActionState::ECAS_Attacking;
-			healthComponent->UseStamina(healthComponent->GetMinStaminaToAttack());
+			attributeComponent->UseStamina(attributeComponent->GetMinStaminaToAttack());
 			if (warriorOverlay)
 			{
-				warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+				warriorOverlay->SetStaminaProgressBar(attributeComponent->GetStaminaPercent());
 			}
 		}
 	
@@ -83,17 +83,17 @@ void AWarrior::Attack()
 
 void AWarrior::Dodge()
 {
-	if ( healthComponent->GetStaminaPercent()*100 < healthComponent->GetMinStaminaToDodge() ||  actionState != ECharacterActionState::ECAS_Unoccupied)
+	if (attributeComponent->GetStaminaPercent()*100 < attributeComponent->GetMinStaminaToDodge() ||  actionState != ECharacterActionState::ECAS_Unoccupied)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("health percent:%f\n minStaminaRequired To dodge:%f"), healthComponent->GetStaminaPercent() * 100, healthComponent->GetMinStaminaToDodge());
+		UE_LOG(LogTemp, Warning, TEXT("health percent:%f\n minStaminaRequired To dodge:%f"), attributeComponent->GetStaminaPercent() * 100, attributeComponent->GetMinStaminaToDodge());
 		return;
 	}
-	healthComponent->UseStamina(healthComponent->GetMinStaminaToDodge());
+	attributeComponent->UseStamina(attributeComponent->GetMinStaminaToDodge());
 	actionState = ECharacterActionState::ECAS_Dodge;
 	PlayMontage(dodgeMontage, FName("Dodge"));
 	if (warriorOverlay)
 	{
-		warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+		warriorOverlay->SetStaminaProgressBar(attributeComponent->GetStaminaPercent());
 	}
 	
 }
@@ -105,7 +105,7 @@ void AWarrior::DodgeEnd()
 
 void AWarrior::Jump()
 {
-	if (healthComponent->IsAlive())
+	if (attributeComponent->IsAlive())
 	{
 		Super::Jump();
 	}
@@ -158,10 +158,10 @@ void AWarrior::SetOverlapingItem(AItem* item)
 
 void AWarrior::AddSouls(ASoul* soul)
 {
-	if (healthComponent && warriorOverlay)
+	if (attributeComponent && warriorOverlay)
 	{
-		healthComponent->AddSouls(soul->GetSoulValue());
-		warriorOverlay->SetSoulCount(healthComponent->GetSouls());
+		attributeComponent->AddSouls(soul->GetSoulValue());
+		warriorOverlay->SetSoulCount(attributeComponent->GetSouls());
 	}
 }
 
@@ -172,7 +172,7 @@ void AWarrior::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingAc
 {
 	Super::TakeHit_Implementation(pointOfImpact, imHittingActor);
 	HandleWeaponBoxCollision(ECollisionEnabled::NoCollision);
-	if (healthComponent->IsAlive())
+	if (attributeComponent->IsAlive())
 	{
 		HitDirection(imHittingActor->GetActorLocation());
 		actionState = ECharacterActionState::ECAS_HitReact;
@@ -224,10 +224,10 @@ void AWarrior::CreateWarriorHUD()
 		{
 			warriorOverlay = warriorHUD->GetWarriorOverlay();
 
-			if (warriorOverlay && healthComponent)
+			if (warriorOverlay && attributeComponent)
 			{
-				warriorOverlay->SetHealthProgressBar(healthComponent->GetHealthPercent());
-				warriorOverlay->SetStaminaProgressBar(healthComponent->GetStaminaPercent());
+				warriorOverlay->SetHealthProgressBar(attributeComponent->GetHealthPercent());
+				warriorOverlay->SetStaminaProgressBar(attributeComponent->GetStaminaPercent());
 				warriorOverlay->SetSoulCount(5);
 			}
 		}
@@ -279,13 +279,17 @@ void AWarrior::LookUp(float value)
 
 void AWarrior::StartRun(float value)
 {
-	if (healthComponent->GetStaminaPercent()*100 <=1.f)
+	if (!attributeComponent)
+	{
+		return;
+	}
+	if (attributeComponent->GetStaminaPercent()*100 <=1.f)
 	{
 		canRun = false;
 		return;
 	}
 
-	if (value > 0 &&  healthComponent && healthComponent->GetStaminaPercent()*100>healthComponent->GetMinStaminaToRun())
+	if (value > 0 && attributeComponent && attributeComponent->GetStaminaPercent()*100> attributeComponent->GetMinStaminaToRun())
 	{
 		canRun = true;
 	}
@@ -360,9 +364,9 @@ void AWarrior::Disarm()
 
 void AWarrior::UpdateHealthProgressBar()
 {
-	if (warriorOverlay && healthComponent)
+	if (warriorOverlay && attributeComponent)
 	{
-		warriorOverlay->SetHealthProgressBar(healthComponent->GetHealthPercent());
+		warriorOverlay->SetHealthProgressBar(attributeComponent->GetHealthPercent());
 	}
 }
 

@@ -177,11 +177,11 @@ void AEnemy::StartPatroling()
 void AEnemy::SpawnSoul()
 {
 	UWorld* world = GetWorld();
-	if (world && healthComponent && soulClass)
+	if (world && attributeComponent && soulClass)
 	{
 		FVector spawnLocation = GetActorLocation() + FVector(0.f, 0.f, 25.f);
 		ASoul* spawnedSoul = world->SpawnActor<ASoul>(soulClass,spawnLocation,GetActorRotation() );
-		spawnedSoul->SetSouls(healthComponent->GetSouls());
+		spawnedSoul->SetSouls( attributeComponent->GetSouls());
 	}
 }
 
@@ -342,9 +342,9 @@ void AEnemy::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActo
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount,DamageEvent, EventInstigator,DamageCauser);
-	if (healthComponent && healthBarWidgetComponet) {
+	if (attributeComponent && healthBarWidgetComponet) {
 
-		healthBarWidgetComponet->SetHealthBarPercent(healthComponent->GetHealthPercent());
+		healthBarWidgetComponet->SetHealthBarPercent(attributeComponent->GetHealthPercent());
 		
 	}
 	combatTarget = EventInstigator->GetPawn();

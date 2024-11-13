@@ -15,7 +15,7 @@ ABaseCharacter::ABaseCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	healthComponent = CreateDefaultSubobject <UHealthComponent >(TEXT("HealthComp"));
+	attributeComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Attribute"));
 
 }
  
@@ -160,7 +160,7 @@ void ABaseCharacter::HitDirection( const FVector& impactPoint)
 
 bool ABaseCharacter::IsAlive()
 {
-	return healthComponent && healthComponent->IsAlive();
+	return attributeComponent && attributeComponent->IsAlive();
 }
 
 void ABaseCharacter::OnDeath()
@@ -223,9 +223,9 @@ void ABaseCharacter::PlayMontage(UAnimMontage* montage, FName sectionName)
 
 float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (healthComponent)
+	if(attributeComponent)
 	{
-		healthComponent->ReceiveDamage(DamageAmount);
+		attributeComponent->ReceiveDamage(DamageAmount);
 		UE_LOG(LogTemp, Warning, TEXT("damage received"));
 	}
 	else
