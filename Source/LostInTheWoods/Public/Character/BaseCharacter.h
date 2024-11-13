@@ -61,8 +61,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Combat)
 	class AWeapon* inHandWeapon;
 
-	UPROPERTY(VisibleAnywhere)
-	class UHealthComponent* healthComponent;
+	UPROPERTY(EditAnywhere)
+	class UHealthComponent* attributeComponent;
+	
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* attackMontage;
