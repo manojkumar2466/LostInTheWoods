@@ -52,6 +52,12 @@ private:
 	double patrolRadius = 100.f;
 
 	UPROPERTY(EditAnywhere)
+	double patrolWaitTimeMin = 2;
+
+	UPROPERTY(EditAnywhere)
+	double patrolwaitTimeMax = 4;
+
+	UPROPERTY(EditAnywhere)
 	double patrolWalkSpeed = 150.f;
 
 	UPROPERTY(EditAnywhere)

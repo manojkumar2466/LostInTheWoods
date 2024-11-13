@@ -97,6 +97,7 @@ void AEnemy::Tick(float DeltaTime)
 	{
 		PatrolCheck();
 	}
+	
 
 }
 
@@ -268,7 +269,7 @@ void AEnemy::PatrolCheck()
 	if (IsInRange(patrolTarget, patrolRadius))
 	{
 		ChangePatrolPoint();
-		GetWorldTimerManager().SetTimer(patrolTimer, this, &AEnemy::OnPatrolTimerFinished, FMath::RandRange(1.f, 5.f));
+		GetWorldTimerManager().SetTimer(patrolTimer, this, &AEnemy::OnPatrolTimerFinished, FMath::RandRange(patrolWaitTimeMin, patrolwaitTimeMax));
 
 	}
 }
