@@ -24,6 +24,6 @@ class LOSTINTHEWOODS_API IPickup
 public:
 
 	virtual void SetOverlapingItem(class AItem* item);
-	virtual void AddSouls(class ASoul* soul);
+	virtual void AddSoulOrHealth(class ASoul* soul);
 
 };

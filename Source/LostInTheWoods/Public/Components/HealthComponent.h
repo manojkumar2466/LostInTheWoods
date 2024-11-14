@@ -57,6 +57,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	int souls;
 
+	UPROPERTY(EditAnywhere)
+	int life;
+
 
 public:		
 	
@@ -79,6 +82,8 @@ public:
 
 	void AddSouls(int value);
 
+	void AddHealth(int value);
 	FORCEINLINE int GetSouls() { return souls; };
+	FORCEINLINE int GetLife() { return life; };
 		
 };

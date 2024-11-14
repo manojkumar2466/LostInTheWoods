@@ -28,7 +28,7 @@ public:
 	FORCEINLINE ECharacterWeaponEquipState GetCharacterState() { return characterWeaponState; }
  
 	void SetOverlapingItem(class AItem* item) override;
-	virtual void AddSouls(class ASoul* soul) override;
+	virtual void AddSoulOrHealth(class ASoul* soul) override;
 
 	FORCEINLINE ECharacterActionState GetWarriorActionState() { return actionState; }
 	//HitInterface
@@ -55,6 +55,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category= Combat)
 	UAnimMontage* RageAttackMontage;
 
+	
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* LowerAttackMontage;
 

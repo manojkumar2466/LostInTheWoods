@@ -97,6 +97,7 @@ void AEnemy::Tick(float DeltaTime)
 	{
 		PatrolCheck();
 	}
+	
 
 }
 
@@ -174,14 +175,30 @@ void AEnemy::StartPatroling()
 	MoveToTarget(patrolTarget, patrolAcceptanceRadius);
 }
 
-void AEnemy::SpawnSoul()
+void AEnemy::SpawnSoulOrHealth()
 {
 	UWorld* world = GetWorld();
 	if (world && attributeComponent && soulClass)
 	{
 		FVector spawnLocation = GetActorLocation() + FVector(0.f, 0.f, 25.f);
-		ASoul* spawnedSoul = world->SpawnActor<ASoul>(soulClass,spawnLocation,GetActorRotation() );
-		spawnedSoul->SetSouls( attributeComponent->GetSouls());
+
+		int selectionIndex = FMath::RandRange(0, 1);
+		TEnumAsByte<ECollectable> collectableType(selectionIndex);
+		ASoul* spawnedSoulorHealth = world->SpawnActor<ASoul>(soulClass, spawnLocation, GetActorRotation());
+		if (collectableType == ECollectable::EC_Soul) {
+			
+			spawnedSoulorHealth->SetSouls(attributeComponent->GetSouls());
+			spawnedSoulorHealth->collectbleType = ECollectable::EC_Soul;
+		}
+		else if (collectableType == ECollectable::EC_Health)
+		{
+			spawnedSoulorHealth->SetHealth(attributeComponent->GetLife());
+			spawnedSoulorHealth->SetItemVFX(spawnedSoulorHealth->GetHealthVFX());
+			spawnedSoulorHealth->collectbleType = ECollectable::EC_Health;
+			
+		}
+		
+		
 	}
 }
 
@@ -259,7 +276,7 @@ void AEnemy::OnDeath()
 	DisableCapusleCollider();
 	ClearTimer(attackTimer);
 	GetCharacterMovement()->bOrientRotationToMovement = false;	
-    GetWorldTimerManager().SetTimer(soulSpawnTimer,this, &AEnemy::SpawnSoul,1.5f, false );
+    GetWorldTimerManager().SetTimer(soulSpawnTimer,this, &AEnemy::SpawnSoulOrHealth,1.5f, false );
 }
 
 
@@ -268,7 +285,7 @@ void AEnemy::PatrolCheck()
 	if (IsInRange(patrolTarget, patrolRadius))
 	{
 		ChangePatrolPoint();
-		GetWorldTimerManager().SetTimer(patrolTimer, this, &AEnemy::OnPatrolTimerFinished, FMath::RandRange(1.f, 5.f));
+		GetWorldTimerManager().SetTimer(patrolTimer, this, &AEnemy::OnPatrolTimerFinished, FMath::RandRange(patrolWaitTimeMin, patrolwaitTimeMax));
 
 	}
 }

@@ -81,6 +81,11 @@ void UHealthComponent::AddSouls(int value)
 	souls += value;
 }
 
+void UHealthComponent::AddHealth(int value)
+{
+	health += value;
+}
+
 
 // Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
