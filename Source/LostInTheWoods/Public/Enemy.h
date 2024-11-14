@@ -133,7 +133,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float attackMaxTime;
 
-	
+
 	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -162,7 +162,7 @@ protected:
 	void StartPatroling();
 
 	
-	void SpawnSoul();
+	void SpawnSoulOrHealth();
 
 
 public:

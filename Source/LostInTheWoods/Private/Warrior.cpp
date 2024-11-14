@@ -156,12 +156,21 @@ void AWarrior::SetOverlapingItem(AItem* item)
 	overlappingItem = item;
 }
 
-void AWarrior::AddSouls(ASoul* soul)
+void AWarrior::AddSoulOrHealth(ASoul* soul)
 {
 	if (attributeComponent && warriorOverlay)
 	{
-		attributeComponent->AddSouls(soul->GetSoulValue());
-		warriorOverlay->SetSoulCount(attributeComponent->GetSouls());
+		if (soul->collectbleType == ECollectable::EC_Soul)
+		{
+			attributeComponent->AddSouls(soul->GetSoulValue());
+			warriorOverlay->SetSoulCount(attributeComponent->GetSouls());
+		}
+		else if (soul->collectbleType == ECollectable::EC_Health)
+		{
+			attributeComponent->AddHealth(soul->GetHealthValue());
+			warriorOverlay->SetHealthProgressBar(attributeComponent->GetHealthPercent());
+		}
+		
 	}
 }
 

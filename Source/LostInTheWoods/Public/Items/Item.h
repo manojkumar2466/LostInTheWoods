@@ -16,6 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	AItem();
 
+	ECollectable collectbleType;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -52,14 +54,22 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UNiagaraComponent* itemEffect;
 
+	
+
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* pickupVFX;
 	
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* healthpickupVFX;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraComponent* redHealthVFX;
 
 	EWeaponState weaponState = EWeaponState::EWS_Hovering;
 
 public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override; 
+	void SetItemVFX(class UNiagaraComponent* vfx);
 
 };

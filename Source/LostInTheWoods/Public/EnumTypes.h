@@ -55,3 +55,10 @@ enum class ECharacterAttackType : uint8
 	ECAT_RageAttack UMETA(DisplayName = "Rage Attack"),
 	ECAT_LowerAttck UMETA(DisplayName = "Lower Attack")
 };
+
+UENUM( BlueprintType)
+enum class ECollectable : uint8
+{
+	EC_Soul UMETA(DisplayName= "Soul"),
+	EC_Health UMETA(DisplayName="Health")
+};

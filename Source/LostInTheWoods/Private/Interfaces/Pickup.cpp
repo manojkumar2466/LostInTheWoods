@@ -8,7 +8,7 @@ void IPickup::SetOverlapingItem(AItem* item)
 
 }
 
-void IPickup::AddSouls(ASoul* soul)
+void IPickup::AddSoulOrHealth(ASoul* soul)
 {
 
 }

@@ -28,6 +28,10 @@ AItem::AItem()
 
 	itemEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("VFX"));
 	itemEffect->SetupAttachment(GetRootComponent());
+
+	redHealthVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("HealthVFX"));
+	redHealthVFX->SetupAttachment(GetRootComponent());
+	redHealthVFX->SetVisibility(false);
 	
 }
 
@@ -70,6 +74,7 @@ void AItem::PlayPickupSound()
 
 void AItem::SpawnPickupVFX()
 {
+	
 	if (pickupVFX)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, pickupVFX, GetActorLocation());
@@ -91,5 +96,11 @@ void AItem::Tick(float DeltaTime)
 	}
 	
 
+}
+
+void AItem::SetItemVFX(UNiagaraComponent* vfx)
+{
+	vfx->SetVisibility(true);
+	itemEffect = vfx;
 }
 
