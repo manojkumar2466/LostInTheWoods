@@ -82,6 +82,12 @@ protected:
 
 private:
 
+	UPROPERTY(EditAnywhere)
+	float attackRadius=100.f;
+
+	UPROPERTY(EditAnywhere)
+	float warriorSightRadius =500;
+
 	bool canUseLeftOverStaminaToRun = true;
 	UPROPERTY(EditAnywhere)
 	float walkSpeed=150.f;
@@ -126,7 +132,9 @@ private:
 	bool CanDisarm();
 	bool CanEquipWeapon();
 	
-	
+	UFUNCTION(BlueprintCallable)
+	bool IsEnemyInAttackRadius(AActor* enemy);
+
 	UFUNCTION(BlueprintCallable)
 	void EquipWeaponFromBack();
 
@@ -139,6 +147,10 @@ private:
 	void Disarm();
 
 	void UpdateHealthProgressBar();
+
+	
+	
+
 
 
 };
