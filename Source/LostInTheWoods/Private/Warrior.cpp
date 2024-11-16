@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/WarrirorOverlay.h"
 #include "Components/HealthComponent.h"
+#include "Perception/PawnSensingComponent.h"
 
 // Sets default values
 AWarrior::AWarrior()
@@ -37,6 +38,14 @@ AWarrior::AWarrior()
 	camera->SetupAttachment(springArm);
 	Tags.Add(FName("Warrior"));
 
+	
+	/*if (pawnSensing)
+	{
+		pawnSensing->SightRadius = 4000;
+		pawnSensing->SetPeripheralVisionAngle(75.f);
+		pawnSensing->OnSeePawn.AddDynamic(this, &AWarrior::OnPawnSeen);
+	}*/
+
 }
 
 // Called when the game starts or when spawned
@@ -44,6 +53,8 @@ void AWarrior::BeginPlay()
 {
 	Super::BeginPlay();
 	 
+
+	
 	CreateWarriorHUD();
 }
 void AWarrior::Tick(float DeltaTime)
@@ -60,6 +71,14 @@ void AWarrior::Tick(float DeltaTime)
 	{
 		attributeComponent->RegenerateStamina(DeltaTime);
 		warriorOverlay->SetStaminaProgressBar(attributeComponent->GetStaminaPercent());
+	}
+	if (combatTarget)
+	{
+		bool canLetGoEnemy = IsEnemyInAttackRadius(combatTarget);
+		if (!canLetGoEnemy)
+		{
+			combatTarget = nullptr;
+		}
 	}
 
 }
@@ -163,7 +182,7 @@ void AWarrior::AddSoulOrHealth(ASoul* soul)
 		if (soul->collectbleType == ECollectable::EC_Soul)
 		{
 			attributeComponent->AddSouls(soul->GetSoulValue());
-			warriorOverlay->SetSoulCount(attributeComponent->GetSouls());
+			warriorOverlay->SetSoulCount(attributeComponent->GetSoulsCount());
 		}
 		else if (soul->collectbleType == ECollectable::EC_Health)
 		{
@@ -186,6 +205,7 @@ void AWarrior::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingAc
 		HitDirection(imHittingActor->GetActorLocation());
 		actionState = ECharacterActionState::ECAS_HitReact;
 	}
+	
 
 }
 
@@ -326,6 +346,18 @@ bool AWarrior::CanEquipWeapon()
 	return  inHandWeapon && characterWeaponState != ECharacterWeaponEquipState::ECWES_Equipped && actionState == ECharacterActionState::ECAS_Unoccupied;
 }
 
+bool AWarrior::IsEnemyInAttackRadius(AActor* enemy)
+{
+	FVector enemyLocation = enemy->GetActorLocation();
+	float distanceBetweenEnemy = (enemyLocation - GetActorLocation()).Size();
+	UE_LOG(LogTemp, Error, TEXT("Player to enemy dist: %f "), distanceBetweenEnemy);
+	if (distanceBetweenEnemy <= attackRadius)
+	{
+		return true;
+	}
+	return false;
+}
+
 
 
 
@@ -378,6 +410,9 @@ void AWarrior::UpdateHealthProgressBar()
 		warriorOverlay->SetHealthProgressBar(attributeComponent->GetHealthPercent());
 	}
 }
+
+
+
 
 void AWarrior::HitReactEnd()
 {

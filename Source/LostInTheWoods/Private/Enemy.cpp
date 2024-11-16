@@ -185,14 +185,15 @@ void AEnemy::SpawnSoulOrHealth()
 		int selectionIndex = FMath::RandRange(0, 1);
 		TEnumAsByte<ECollectable> collectableType(selectionIndex);
 		ASoul* spawnedSoulorHealth = world->SpawnActor<ASoul>(soulClass, spawnLocation, GetActorRotation());
-		if (collectableType == ECollectable::EC_Soul) {
+		if (spawnedSoulorHealth && collectableType == ECollectable::EC_Soul) {
 			
-			spawnedSoulorHealth->SetSouls(attributeComponent->GetSouls());
+			spawnedSoulorHealth->SetSouls(attributeComponent->GetSoulsCount());
 			spawnedSoulorHealth->collectbleType = ECollectable::EC_Soul;
 		}
-		else if (collectableType == ECollectable::EC_Health)
+		else if (spawnedSoulorHealth && collectableType == ECollectable::EC_Health)
 		{
-			spawnedSoulorHealth->SetHealth(attributeComponent->GetLife());
+			
+			spawnedSoulorHealth->SetHealth(attributeComponent->GetLifeCount());
 			spawnedSoulorHealth->SetItemVFX(spawnedSoulorHealth->GetHealthVFX());
 			spawnedSoulorHealth->collectbleType = ECollectable::EC_Health;
 			
@@ -364,7 +365,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		healthBarWidgetComponet->SetHealthBarPercent(attributeComponent->GetHealthPercent());
 		
 	}
-	combatTarget = EventInstigator->GetPawn();
+	
 	
 	if (IsInRange(combatTarget, attackingRadius))
 	{

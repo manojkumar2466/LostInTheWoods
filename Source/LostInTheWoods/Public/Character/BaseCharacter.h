@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = VFX)
 	UParticleSystem* bloodVFX;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	AActor* combatTarget;
 
 
@@ -60,6 +60,9 @@ protected:
 		
 	UPROPERTY(VisibleAnywhere, Category = Combat)
 	class AWeapon* inHandWeapon;
+
+	UPROPERTY(VisibleAnywhere)
+	class UPawnSensingComponent* pawnSensing;
 
 	UPROPERTY(EditAnywhere)
 	class UHealthComponent* attributeComponent;

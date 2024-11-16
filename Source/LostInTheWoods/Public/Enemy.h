@@ -94,8 +94,7 @@ private:
 
 	FTimerHandle patrolTimer;
 
-	UPROPERTY(VisibleAnywhere)
-	class UPawnSensingComponent* pawnSensing;
+	
 
 	bool CanAttack();
 	void ClearTimer(FTimerHandle timer);

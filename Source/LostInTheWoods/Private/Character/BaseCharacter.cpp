@@ -16,7 +16,7 @@ ABaseCharacter::ABaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	attributeComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Attribute"));
-
+	
 }
  
 // Called when the game starts or when spawned
@@ -223,6 +223,7 @@ void ABaseCharacter::PlayMontage(UAnimMontage* montage, FName sectionName)
 
 float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	combatTarget = EventInstigator->GetPawn();
 	if(attributeComponent)
 	{
 		attributeComponent->ReceiveDamage(DamageAmount);

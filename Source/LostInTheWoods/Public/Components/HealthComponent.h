@@ -83,7 +83,7 @@ public:
 	void AddSouls(int value);
 
 	void AddHealth(int value);
-	FORCEINLINE int GetSouls() { return souls; };
-	FORCEINLINE int GetLife() { return life; };
+	FORCEINLINE int GetSoulsCount() { return souls; }
+	FORCEINLINE int GetLifeCount() { return life; }
 		
 };
