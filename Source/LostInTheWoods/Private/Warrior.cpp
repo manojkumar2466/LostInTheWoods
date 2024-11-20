@@ -77,6 +77,7 @@ void AWarrior::Tick(float DeltaTime)
 		bool canLetGoEnemy = IsEnemyInAttackRadius(combatTarget);
 		if (!canLetGoEnemy)
 		{
+			UE_LOG(LogTemp, Error, TEXT("making combat target null"));
 			combatTarget = nullptr;
 		}
 	}
