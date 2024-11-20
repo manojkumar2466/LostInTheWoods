@@ -135,6 +135,7 @@ private:
 	UFUNCTION(BlueprintCallable)
 	bool IsEnemyInAttackRadius(AActor* enemy);
 
+	int debugValue = 0;
 	UFUNCTION(BlueprintCallable)
 	void EquipWeaponFromBack();
 

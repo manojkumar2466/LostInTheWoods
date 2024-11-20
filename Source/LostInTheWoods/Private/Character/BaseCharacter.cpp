@@ -76,7 +76,7 @@ void ABaseCharacter::TakeHit_Implementation(FVector pointOfImpact, AActor* imHit
 	PlayHitSound(pointOfImpact);
 	PlayBloodVFX(pointOfImpact);
 
-	DrawDebugSphere(GetWorld(), pointOfImpact, 8.f, 32.f, FColor::Blue, false, 5.f);
+	
 }
 
 
@@ -140,10 +140,8 @@ void ABaseCharacter::HitDirection( const FVector& impactPoint)
 	if (crossProductVector.Z < 0) {
 		degrees *= -1.f;
 	}
-	GEngine->AddOnScreenDebugMessage(1, 5, FColor::Blue, FString::Printf(TEXT("Angle:%f"), degrees));
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + forwardVector * 60, 40.f, FLinearColor::Blue, 5.f);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + normalZToHit * 60, 40.f, FLinearColor::Red, 5.f);
-	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + crossProductVector * 100.f, 40.f, FLinearColor::Black, 5.f);
+	
+	
 
 	FName hitReactionSectionName("FromBack");
 	if (degrees < 45 && degrees >= -45) {

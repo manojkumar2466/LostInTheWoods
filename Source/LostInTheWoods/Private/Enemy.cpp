@@ -344,7 +344,9 @@ void AEnemy::TakeHit_Implementation(FVector pointOfImpact, AActor* imHittingActo
 	{
 		if (IsAlive())
 		{
-			
+
+			float distnace = (patrolTarget->GetActorLocation() - GetActorLocation()).Size();
+			UE_LOG(LogTemp, Error, TEXT(" Attacking Range and distance is:%f "), distnace);
 			StartAttackTimer();
 			UE_LOG(LogTemp, Error, TEXT("Started Attacking"));
 		}
